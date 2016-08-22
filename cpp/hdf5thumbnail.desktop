@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Service
+Name=HDF5 Image
+X-KDE-ServiceTypes=ThumbCreator
+MimeType=application/x-hdf
+CacheThumbnail=true
+X-KDE-Library=hdf5thumbnail
