@@ -1,0 +1,3 @@
+/home/scm/projects/hdf5Thumbnails/cppbuild/CMakeFiles/hdf5thumbnail_automoc.dir
+/home/scm/projects/hdf5Thumbnails/cppbuild/CMakeFiles/hdf5thumbnail.dir
+/home/scm/projects/hdf5Thumbnails/cppbuild/CMakeFiles/uninstall.dir
