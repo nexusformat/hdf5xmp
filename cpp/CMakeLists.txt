@@ -14,7 +14,7 @@ include(KDECompilerSettings)
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Gui)
 find_package(KF5 REQUIRED COMPONENTS KIO Archive)
 
-set(hdf5thumbnail_SRCS hdf5thumbnail.cpp test.cpp)
+set(hdf5thumbnail_SRCS hdf5thumbnail.cpp)
 
 add_library(hdf5thumbnail MODULE ${hdf5thumbnail_SRCS})
 target_link_libraries(hdf5thumbnail Qt5::Gui KF5::KIOWidgets KF5::Archive hdf5 hdf5_cpp hdf5_hl)
