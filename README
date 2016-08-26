@@ -1,0 +1,21 @@
+Hier ist ein prototyp des hdf5 thumbnail generators.
+
+Im python ordner sind 2 scripts. Eines fügt ein Bild nach wahl in eine hdf5 datei ein, das Andere extrahiert dieses wieder.
+
+Im hdf5Files ordner sind ein paar hdf5 Dateien, wovon 2 ein thumbnail haben.
+
+Im cpp ordner findet man die Dateien, welche das Plugin für den Dolphin zusammensetzen.
+
+Zum builden und installieren führt man im cpp ordner folgendes aus:
+
+    mkdir build && cd build
+
+    cmake ..
+
+    make
+
+    sudo make install
+
+Danach muss man im Dolphin, bei den Einstellungen unter General > Previews, nur noch ein häkchen bei hdf5 files machen.
+
+Danach sollte es die thumbnails generieren und auch grad im cache speichern.
