@@ -5,8 +5,11 @@
 
 class Hdf5Creator : public ThumbCreator {
 
-public:
-    virtual bool create(const QString& path, int width, int height, QImage& img);
+ public:
+  Hdf5Creator();
+  virtual ~Hdf5Creator();
+  virtual bool create(const QString &path, int width, int height, QImage &img);
+  virtual Flags flags() const;
 };
 
 
