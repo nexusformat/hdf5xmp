@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=hdf5thumbnailer
+Exec=hdf5thumbnailer %i %o %s
+MimeType=application/x-hdf
