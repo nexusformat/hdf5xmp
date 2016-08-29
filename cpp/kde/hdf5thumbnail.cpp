@@ -55,7 +55,7 @@ bool Hdf5Creator::create( const QString& path, int width, int height, QImage& im
   QImage image;
   // Turns the base64 into an image
   image.loadFromData(QByteArray::fromBase64(base64Data));
-  img = image.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  img = image.scaled(width, height);
   file.close();
   return true;
 }

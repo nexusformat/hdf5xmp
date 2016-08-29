@@ -1,2 +1,4 @@
+/usr/lib/qt5/plugins/hdf5thumbnail.so
+/usr/local/share/kservices5/hdf5thumbnail.desktop
 /usr/bin/hdf5thumbnailer
 /usr/share/thumbnailers/hdf5.thumbnailer

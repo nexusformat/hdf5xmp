@@ -33,6 +33,38 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "hdf5thumbnail")
+  if(EXISTS "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so")
+    file(RPATH_CHECK
+         FILE "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so"
+         RPATH "/usr/local/lib64")
+  endif()
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/usr/lib/qt5/plugins/hdf5thumbnail.so")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+file(INSTALL DESTINATION "/usr/lib/qt5/plugins" TYPE MODULE FILES "/home/scm/projects/hdfthumbs/cpp/build/hdf5thumbnail.so")
+  if(EXISTS "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so")
+    file(RPATH_CHANGE
+         FILE "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so"
+         OLD_RPATH "::::::::::::::::"
+         NEW_RPATH "/usr/local/lib64")
+    if(CMAKE_INSTALL_DO_STRIP)
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/usr/lib/qt5/plugins/hdf5thumbnail.so")
+    endif()
+  endif()
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "hdf5thumbnail")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/kservices5" TYPE FILE FILES "/home/scm/projects/hdfthumbs/cpp/kde/hdf5thumbnail.desktop")
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "hdf5thumbnail")
   if(EXISTS "$ENV{DESTDIR}/usr/bin/hdf5thumbnailer" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}/usr/bin/hdf5thumbnailer")
     file(RPATH_CHECK
@@ -74,6 +106,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/scm/projects/hdfthumbs/cpp/build/kde/cmake_install.cmake")
   include("/home/scm/projects/hdfthumbs/cpp/build/gnome/cmake_install.cmake")
 
 endif()

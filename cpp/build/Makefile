@@ -179,6 +179,19 @@ hdf5thumbnailer/fast:
 .PHONY : hdf5thumbnailer/fast
 
 #=============================================================================
+# Target rules for targets named hdf5thumbnail
+
+# Build rule for target.
+hdf5thumbnail: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 hdf5thumbnail
+.PHONY : hdf5thumbnail
+
+# fast build rule for target.
+hdf5thumbnail/fast:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/build
+.PHONY : hdf5thumbnail/fast
+
+#=============================================================================
 # Target rules for targets named uninstall
 
 # Build rule for target.
@@ -203,6 +216,19 @@ hdf5thumbnailer_automoc: cmake_check_build_system
 hdf5thumbnailer_automoc/fast:
 	$(MAKE) -f CMakeFiles/hdf5thumbnailer_automoc.dir/build.make CMakeFiles/hdf5thumbnailer_automoc.dir/build
 .PHONY : hdf5thumbnailer_automoc/fast
+
+#=============================================================================
+# Target rules for targets named hdf5thumbnail_automoc
+
+# Build rule for target.
+hdf5thumbnail_automoc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 hdf5thumbnail_automoc
+.PHONY : hdf5thumbnail_automoc
+
+# fast build rule for target.
+hdf5thumbnail_automoc/fast:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail_automoc.dir/build.make CMakeFiles/hdf5thumbnail_automoc.dir/build
+.PHONY : hdf5thumbnail_automoc/fast
 
 gnome/hdf5thumbnail.o: gnome/hdf5thumbnail.cpp.o
 
@@ -231,6 +257,33 @@ gnome/hdf5thumbnail.cpp.s:
 	$(MAKE) -f CMakeFiles/hdf5thumbnailer.dir/build.make CMakeFiles/hdf5thumbnailer.dir/gnome/hdf5thumbnail.cpp.s
 .PHONY : gnome/hdf5thumbnail.cpp.s
 
+hdf5thumbnail_automoc.o: hdf5thumbnail_automoc.cpp.o
+
+.PHONY : hdf5thumbnail_automoc.o
+
+# target to build an object file
+hdf5thumbnail_automoc.cpp.o:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/hdf5thumbnail_automoc.cpp.o
+.PHONY : hdf5thumbnail_automoc.cpp.o
+
+hdf5thumbnail_automoc.i: hdf5thumbnail_automoc.cpp.i
+
+.PHONY : hdf5thumbnail_automoc.i
+
+# target to preprocess a source file
+hdf5thumbnail_automoc.cpp.i:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/hdf5thumbnail_automoc.cpp.i
+.PHONY : hdf5thumbnail_automoc.cpp.i
+
+hdf5thumbnail_automoc.s: hdf5thumbnail_automoc.cpp.s
+
+.PHONY : hdf5thumbnail_automoc.s
+
+# target to generate assembly for a file
+hdf5thumbnail_automoc.cpp.s:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/hdf5thumbnail_automoc.cpp.s
+.PHONY : hdf5thumbnail_automoc.cpp.s
+
 hdf5thumbnailer_automoc.o: hdf5thumbnailer_automoc.cpp.o
 
 .PHONY : hdf5thumbnailer_automoc.o
@@ -258,6 +311,33 @@ hdf5thumbnailer_automoc.cpp.s:
 	$(MAKE) -f CMakeFiles/hdf5thumbnailer.dir/build.make CMakeFiles/hdf5thumbnailer.dir/hdf5thumbnailer_automoc.cpp.s
 .PHONY : hdf5thumbnailer_automoc.cpp.s
 
+kde/hdf5thumbnail.o: kde/hdf5thumbnail.cpp.o
+
+.PHONY : kde/hdf5thumbnail.o
+
+# target to build an object file
+kde/hdf5thumbnail.cpp.o:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/kde/hdf5thumbnail.cpp.o
+.PHONY : kde/hdf5thumbnail.cpp.o
+
+kde/hdf5thumbnail.i: kde/hdf5thumbnail.cpp.i
+
+.PHONY : kde/hdf5thumbnail.i
+
+# target to preprocess a source file
+kde/hdf5thumbnail.cpp.i:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/kde/hdf5thumbnail.cpp.i
+.PHONY : kde/hdf5thumbnail.cpp.i
+
+kde/hdf5thumbnail.s: kde/hdf5thumbnail.cpp.s
+
+.PHONY : kde/hdf5thumbnail.s
+
+# target to generate assembly for a file
+kde/hdf5thumbnail.cpp.s:
+	$(MAKE) -f CMakeFiles/hdf5thumbnail.dir/build.make CMakeFiles/hdf5thumbnail.dir/kde/hdf5thumbnail.cpp.s
+.PHONY : kde/hdf5thumbnail.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -272,14 +352,22 @@ help:
 	@echo "... install/strip"
 	@echo "... rebuild_cache"
 	@echo "... hdf5thumbnailer"
+	@echo "... hdf5thumbnail"
 	@echo "... uninstall"
 	@echo "... hdf5thumbnailer_automoc"
+	@echo "... hdf5thumbnail_automoc"
 	@echo "... gnome/hdf5thumbnail.o"
 	@echo "... gnome/hdf5thumbnail.i"
 	@echo "... gnome/hdf5thumbnail.s"
+	@echo "... hdf5thumbnail_automoc.o"
+	@echo "... hdf5thumbnail_automoc.i"
+	@echo "... hdf5thumbnail_automoc.s"
 	@echo "... hdf5thumbnailer_automoc.o"
 	@echo "... hdf5thumbnailer_automoc.i"
 	@echo "... hdf5thumbnailer_automoc.s"
+	@echo "... kde/hdf5thumbnail.o"
+	@echo "... kde/hdf5thumbnail.i"
+	@echo "... kde/hdf5thumbnail.s"
 .PHONY : help
 
 

@@ -315,14 +315,71 @@ KDE_INSTALL_WALLPAPERDIR:PATH=
 //Prevent an "uninstall" target from being generated.
 KDE_SKIP_UNINSTALL_TARGET:BOOL=OFF
 
+//The directory containing a CMake configuration file for KF5Archive.
+KF5Archive_DIR:PATH=/usr/lib64/cmake/KF5Archive
+
+//The directory containing a CMake configuration file for KF5Auth.
+KF5Auth_DIR:PATH=/usr/lib64/cmake/KF5Auth
+
+//The directory containing a CMake configuration file for KF5Bookmarks.
+KF5Bookmarks_DIR:PATH=/usr/lib64/cmake/KF5Bookmarks
+
+//The directory containing a CMake configuration file for KF5Codecs.
+KF5Codecs_DIR:PATH=/usr/lib64/cmake/KF5Codecs
+
+//The directory containing a CMake configuration file for KF5Completion.
+KF5Completion_DIR:PATH=/usr/lib64/cmake/KF5Completion
+
+//The directory containing a CMake configuration file for KF5ConfigWidgets.
+KF5ConfigWidgets_DIR:PATH=/usr/lib64/cmake/KF5ConfigWidgets
+
+//The directory containing a CMake configuration file for KF5Config.
+KF5Config_DIR:PATH=/usr/lib64/cmake/KF5Config
+
+//The directory containing a CMake configuration file for KF5CoreAddons.
+KF5CoreAddons_DIR:PATH=/usr/lib64/cmake/KF5CoreAddons
+
+//The directory containing a CMake configuration file for KF5ItemViews.
+KF5ItemViews_DIR:PATH=/usr/lib64/cmake/KF5ItemViews
+
+//The directory containing a CMake configuration file for KF5JobWidgets.
+KF5JobWidgets_DIR:PATH=/usr/lib64/cmake/KF5JobWidgets
+
+//The directory containing a CMake configuration file for KF5KIO.
+KF5KIO_DIR:PATH=/usr/lib64/cmake/KF5KIO
+
+//The directory containing a CMake configuration file for KF5Service.
+KF5Service_DIR:PATH=/usr/lib64/cmake/KF5Service
+
+//The directory containing a CMake configuration file for KF5Solid.
+KF5Solid_DIR:PATH=/usr/lib64/cmake/KF5Solid
+
+//The directory containing a CMake configuration file for KF5WidgetsAddons.
+KF5WidgetsAddons_DIR:PATH=/usr/lib64/cmake/KF5WidgetsAddons
+
+//The directory containing a CMake configuration file for KF5XmlGui.
+KF5XmlGui_DIR:PATH=/usr/lib64/cmake/KF5XmlGui
+
 //Location of the Qt5 qmake executable
 QMAKE_EXECUTABLE:FILEPATH=/usr/lib64/qt5/bin/qmake
 
 //The directory containing a CMake configuration file for Qt5Core.
 Qt5Core_DIR:PATH=/usr/lib64/cmake/Qt5Core
 
+//The directory containing a CMake configuration file for Qt5DBus.
+Qt5DBus_DIR:PATH=/usr/lib64/cmake/Qt5DBus
+
 //The directory containing a CMake configuration file for Qt5Gui.
 Qt5Gui_DIR:PATH=/usr/lib64/cmake/Qt5Gui
+
+//The directory containing a CMake configuration file for Qt5Network.
+Qt5Network_DIR:PATH=/usr/lib64/cmake/Qt5Network
+
+//The directory containing a CMake configuration file for Qt5Widgets.
+Qt5Widgets_DIR:PATH=/usr/lib64/cmake/Qt5Widgets
+
+//The directory containing a CMake configuration file for Qt5Xml.
+Qt5Xml_DIR:PATH=/usr/lib64/cmake/Qt5Xml
 
 //The directory containing a CMake configuration file for Qt5.
 Qt5_DIR:PATH=/usr/lib64/cmake/Qt5
@@ -333,11 +390,14 @@ gnome:BOOL=ON
 //Value Computed by CMake
 hdf5thumbnail_BINARY_DIR:STATIC=/home/scm/projects/hdfthumbs/cpp/build
 
+//Dependencies for the target
+hdf5thumbnail_LIB_DEPENDS:STATIC=general;Qt5::Gui;general;KF5::KIOWidgets;general;KF5::Archive;general;hdf5;general;hdf5_cpp;general;hdf5_hl;
+
 //Value Computed by CMake
 hdf5thumbnail_SOURCE_DIR:STATIC=/home/scm/projects/hdfthumbs/cpp
 
 //If you have kde installed
-kde:BOOL=OFF
+kde:BOOL=ON
 
 
 ########################
@@ -432,7 +492,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -471,6 +531,12 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding KF5
+FIND_PACKAGE_MESSAGE_DETAILS_KF5:INTERNAL=[success][cfound components:  KIO Archive ][v5.23.0()]
+//Details about finding KF5Archive
+FIND_PACKAGE_MESSAGE_DETAILS_KF5Archive:INTERNAL=[/usr/lib64/cmake/KF5Archive/KF5ArchiveConfig.cmake][v5.23.0()]
+//Details about finding KF5KIO
+FIND_PACKAGE_MESSAGE_DETAILS_KF5KIO:INTERNAL=[/usr/lib64/cmake/KF5KIO/KF5KIOConfig.cmake][v5.23.0()]
 //ADVANCED property for variable: KDE_INSTALL_APPDIR
 KDE_INSTALL_APPDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: KDE_INSTALL_AUTOSTARTDIR
