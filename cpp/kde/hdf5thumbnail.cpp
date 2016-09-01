@@ -10,7 +10,6 @@
 #include <QTextStream>
 
 #define DATA_SET "thumb"
-#define ATTRIBUTE "image"
 
 // Configuration for KDE plugin creation
 extern "C" {
@@ -36,25 +35,16 @@ bool Hdf5Creator::create( const QString& path, int width, int height, QImage& im
   // Gets the dataset with the thumbnail
   H5::DataSet dataset = file.openDataSet(DATA_SET);
   
-  // Checks if the image attribute exists
-  if(!dataset.attrExists(ATTRIBUTE)) {
-    std::cout << "Failure";
-    return false;
-  }
+  std::string dataString;
   
-  H5::Attribute attr = dataset.openAttribute(ATTRIBUTE);
-
-  std::string imageBase64;
-  // Gets the base64 encoded image
-  attr.read(attr.getDataType(), imageBase64);
-  attr.close();
-  // Turns the base64 into a byteArray
-  QByteArray base64Data = QByteArray::fromStdString(imageBase64);
-
-  // Creates an image
+  dataset.read(dataString, dataset.getDataType());
+  
+  QByteArray data(dataString.c_str(), dataString.length());
+   
   QImage image;
+  
   // Turns the base64 into an image
-  image.loadFromData(QByteArray::fromBase64(base64Data));
+  image.loadFromData(QByteArray::fromBase64(data));
   img = image.scaled(width, height);
   file.close();
   return true;

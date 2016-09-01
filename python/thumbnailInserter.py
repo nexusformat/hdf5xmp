@@ -3,6 +3,7 @@
 import sys
 import os
 import os.path
+import numpy as np
 import base64
 import h5py
 
@@ -44,18 +45,11 @@ if __name__ == "__main__":
 
     #  Open the hdf5 file
     with h5py.File(file, 'a') as hf:
-        imgf = open(imageFile, 'r')
+        imgf = open(imageFile, 'rb')
 
+        binary_image = imgf.read()
         #  Creates a new dataSet
-        dset = hf.create_dataset("thumb", (100,))
-
-        #  Makes the image data ready to be stored
-        #  data = os.path.splitext(imageFile)[1][1:].strip() + ":"
-        data = base64.b64encode(imgf.read())
-        #  The data will look like this "fileextension:base64Data"
-
-        #  Stores the image base64 encoded as an attribute
-        dset.attrs["image"] = data
+        dset = hf.create_dataset("thumb", data=base64.b64encode(binary_image))
 
         hf.close()
         imgf.close()
