@@ -1,7 +1,5 @@
 #include "hdf5thumbnail.h"
 
-#include <iostream>
-#include <fstream>
 #include <string>
 
 #include <H5Cpp.h>

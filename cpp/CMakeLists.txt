@@ -43,13 +43,16 @@ if(gnome)
 
   message("GNOME enabled")
 
+
   add_subdirectory(gnome)
 
+  include_directories(/usr/include/ImageMagick-6/)
+  
   set(hdf5thumbnail_gnome_SRCS gnome/hdf5thumbnail.cpp)
 
   add_executable(hdf5thumbnailer ${hdf5thumbnail_gnome_SRCS})
   
-  target_link_libraries(hdf5thumbnailer Qt5::Gui hdf5 hdf5_cpp hdf5_hl)
+  target_link_libraries(hdf5thumbnailer /usr/lib64/libMagick++-6.Q16.so hdf5 hdf5_cpp hdf5_hl)
 
   install(TARGETS hdf5thumbnailer DESTINATION /usr/bin)
   install(FILES gnome/hdf5.thumbnailer DESTINATION /usr/share/thumbnailers/)

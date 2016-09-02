@@ -41,9 +41,9 @@ if __name__ == "__main__":
         #  Creates a new dataSet
         dset = hf["thumb"]
 
-        print(dset[...])
+        data = dset[...]
 
-        imgf.write(base64.b64decode(dset[...]))
+        imgf.write(base64.b64decode(str(data)))
 
         hf.close()
         imgf.close()
