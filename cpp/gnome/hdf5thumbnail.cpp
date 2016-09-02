@@ -1,8 +1,7 @@
 #include <string>
+#include <fstream>
 
 #include <H5Cpp.h>
-
-#include <ImageMagick-6/Magick++.h>
 
 #define DATA_SET "thumb"
 
@@ -14,34 +13,25 @@
 int main(int argc, char* argv[]) {
 
   std::string path = argv[1];
-  
+
   H5::H5File file(path, H5F_ACC_RDONLY);
 
   // Gets the dataset with the thumbnail
   H5::DataSet dataset = file.openDataSet(DATA_SET);
 
-  std::string dataString;
-  
-  dataset.read(dataString, dataset.getDataType());
+  // Get image size and build char array of that size
+  unsigned int size = dataset.getSpace().getSimpleExtentNpoints();
+  char *imageData = new char[size];
 
-  Magick::Blob blob;
+  // read image into imageData
+  dataset.read(imageData, dataset.getDataType());
 
-  blob.base64(dataString);
-  
-  Magick::Image image;
+  // write image to file
+  std::fstream imageFile(argv[2], std::ios::out | std::ios::binary);
+  imageFile.write(imageData, size);
+  imageFile.close();
 
-  image.read(blob);
-
-  // Checks the amount of arguments. If there are enough the image gets resized
-  if(argc >= 4) {
-    image.scale(argv[3]);
-  }
-
-  image.magick("PNG");
-
-  image.write(argv[2]);
-
+  // cleanup
   file.close();
-
-
+  delete[] imageData;
 }

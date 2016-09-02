@@ -1,49 +1,43 @@
 #!/usr/bin/python
 
+"""Extract thumbnail image from hdf5 file"""
+
 import sys
 import os
-import os.path
-import base64
 import h5py
+import argparse
 
-if __name__ == "__main__":
 
-    #  Checks if the correct number of arguments is provided
-    if(len(sys.argv) == 2):
-        print("Error! Invalid number of arguments provided")
-        sys.exit()
-    #  Get the current path
-    dir_path = os.getcwd()
+def main():
 
-    #  Get the file to insert the Image into
-    if(os.path.isabs(sys.argv[1])):
-        file = sys.argv[1]
-    else:
-        file = dir_path + "/" + sys.argv[1]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('hdf5File',
+                        help='filename to extract the image from')
+    parser.add_argument('imageFile',
+                        help='filename of the image to save')
+    args = parser.parse_args()
 
-    #  Get the imageFile
-    imageFile = sys.argv[2]
-
-    #  Checks if the file exists
-    if(not os.path.isfile(file)):
-        print("Error " + str(file) + " is not a file")
+    #  Checks if the hdf5File exists
+    if(not os.path.isfile(args.hdf5File)):
+        print("Error " + args.hdf5File + " is not a file")
         sys.exit()
 
     #  Makes sure that both files aren't the same
-    if(file == imageFile):
+    if(args.hdf5File == args.imageFile):
         print("Error! Both files can't be the same")
         sys.exit()
 
     #  Open the hdf5 file
-    with h5py.File(file, 'r') as hf:
-        imgf = open(imageFile, 'w+')
+    with h5py.File(args.hdf5File, 'r') as hf:
+        imgf = open(args.imageFile, 'wb+')
 
         #  Creates a new dataSet
         dset = hf["thumb"]
-
-        data = dset[...]
-
-        imgf.write(base64.b64decode(str(data)))
+        imgf.write(dset[...])
 
         hf.close()
         imgf.close()
+
+
+if __name__ == "__main__":
+    main()

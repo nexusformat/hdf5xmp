@@ -1,11 +1,8 @@
 #include "hdf5thumbnail.h"
 
-#include <string>
-
 #include <H5Cpp.h>
 
 #include <QImage>
-#include <QTextStream>
 
 #define DATA_SET "thumb"
 
@@ -26,25 +23,27 @@ Hdf5Creator::~Hdf5Creator() {
 
 
 bool Hdf5Creator::create( const QString& path, int width, int height, QImage& img ) {
-  
+
   // Open the file
   H5::H5File file(path.toLocal8Bit().constData(), H5F_ACC_RDONLY);
-  
+
   // Gets the dataset with the thumbnail
   H5::DataSet dataset = file.openDataSet(DATA_SET);
-  
-  std::string dataString;
-  
-  dataset.read(dataString, dataset.getDataType());
-  
-  QByteArray data(dataString.c_str(), dataString.length());
-   
-  QImage image;
-  
-  // Turns the base64 into an image
-  image.loadFromData(QByteArray::fromBase64(data));
-  img = image.scaled(width, height);
+
+  // Get image size and build char array of that size
+  unsigned int size = dataset.getSpace().getSimpleExtentNpoints();
+  uchar *imageData = new uchar[size];
+
+  // read image into imageData
+  dataset.read(imageData, dataset.getDataType());
+
+  // fill img with loaded image
+  img.loadFromData(imageData, size, "PNG");
+
+  // cleanup
   file.close();
+  delete[] imageData;
+
   return true;
 }
 
