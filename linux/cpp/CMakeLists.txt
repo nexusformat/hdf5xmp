@@ -26,11 +26,9 @@ if(kde)
 
   set(hdf5thumbnail_kde_SRCS kde/hdf5thumbnail.cpp)
   
-
   add_library(hdf5thumbnail MODULE ${hdf5thumbnail_kde_SRCS})
-
   
-  target_link_libraries(hdf5thumbnail Qt5::Gui KF5::KIOWidgets KF5::Archive hdf5 hdf5_cpp hdf5_hl)
+  target_link_libraries(hdf5thumbnail Qt5::Gui KF5::KIOWidgets KF5::Archive ${PROJECT_SOURCE_DIR}/lib/libhdf5_hl.a ${PROJECT_SOURCE_DIR}/lib/libhdf5_cpp.a  ${PROJECT_SOURCE_DIR}/lib/libhdf5.a z dl)
 
   set(LIBRARY_INSTALL_DIR /usr/lib/qt5/plugins/)
 
@@ -50,7 +48,7 @@ if(gnome)
 
   add_executable(hdf5thumbnailer ${hdf5thumbnail_gnome_SRCS})
   
-  target_link_libraries(hdf5thumbnailer hdf5 hdf5_cpp hdf5_hl)
+  target_link_libraries(hdf5thumbnailer ${PROJECT_SOURCE_DIR}/lib/libhdf5_cpp.a ${PROJECT_SOURCE_DIR}/lib/libhdf5.a z dl)
 
   install(TARGETS hdf5thumbnailer DESTINATION /usr/bin)
   install(FILES gnome/hdf5.thumbnailer DESTINATION /usr/share/thumbnailers/)
