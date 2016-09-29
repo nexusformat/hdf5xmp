@@ -124,10 +124,13 @@ IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
 
 	// write image to file
 
-	std::string outfile = path + ".png";
+	TCHAR tempFileName[MAX_PATH];
+	TCHAR tempPathName[MAX_PATH];
 
-	// Creates tempfile name
-	outfile += "temporarythumbnailerfile~";
+	GetTempPath(MAX_PATH, tempPathName);
+	GetTempFileName(tempPathName, TEXT("HDF5ThumbnailerFile"), 1, tempFileName);
+
+	std::wstring outfile = tempFileName;
 
 	std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
 	imageFile.write(imageData, size);
@@ -146,20 +149,17 @@ IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
 	ULONG_PTR token;
 	Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
 
-
-	std::cout << outfile << std::endl;
-
-	std::cout << outstr.c_str() << std::endl;
-
-	Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(outstr.c_str(), false);
+	Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outstr.c_str());
 
 	bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
 
+	delete bitmap;
 	// cleanup
 	delete[] imageData;
 	file.close();
 
 	DeleteFile((LPCWSTR)outfile.c_str());
+
 	return S_OK;
 }
 
@@ -167,5 +167,38 @@ IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
 
 
 #pragma region Helper Functions
+
+Gdiplus::Bitmap* HDF5ThumbnailProvider::LoadImageFromFileWithoutLocking(const WCHAR* fileName) {
+	using namespace Gdiplus;
+	Bitmap src(fileName);
+	if (src.GetLastStatus() != Ok) {
+		return 0;
+	}
+	Bitmap *dst = new Bitmap(src.GetWidth(), src.GetHeight(), PixelFormat32bppARGB);
+
+	BitmapData srcData;
+	BitmapData dstData;
+	Rect rc(0, 0, src.GetWidth(), src.GetHeight());
+
+	if (src.LockBits(&rc, ImageLockModeRead, PixelFormat32bppARGB, &srcData) == Ok)
+	{
+		if (dst->LockBits(&rc, ImageLockModeWrite, PixelFormat32bppARGB, &dstData) == Ok) {
+			uint8_t * srcBits = (uint8_t *)srcData.Scan0;
+			uint8_t * dstBits = (uint8_t *)dstData.Scan0;
+			unsigned int stride;
+			if (srcData.Stride > 0) {
+				stride = srcData.Stride;
+			}
+			else {
+				stride = -srcData.Stride;
+			}
+			memcpy(dstBits, srcBits, src.GetHeight() * stride);
+
+			dst->UnlockBits(&dstData);
+		}
+		src.UnlockBits(&srcData);
+	}
+	return dst;
+}
 
 #pragma endregion

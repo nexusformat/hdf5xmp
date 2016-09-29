@@ -284,7 +284,15 @@ HRESULT RegisterShellExtThumbnailHandler(PCWSTR pszFileType, const CLSID& clsid)
         // Set the default value of the key.
         hr = SetHKCRRegistryKeyAndValue(szSubkey, NULL, szCLSID);
     }
+	
+	// Set the DisableProcessIsolation value to 1
+	HKEY key;
 
+	RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("\\CLSID\\{FFBF393D-63EE-4570-8DB6-32BABB555608}"), 0, KEY_ALL_ACCESS, &key);
+
+	DWORD dwordValue(1);
+
+	hr = RegSetValueEx(key, TEXT("DisableProcessIsolation"), 0, REG_DWORD, (const BYTE*) &dwordValue, sizeof(dwordValue));
 	std::cout << "Registered succesfully" << std::endl;
 
     return hr;

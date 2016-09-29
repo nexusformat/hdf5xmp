@@ -31,13 +31,15 @@ WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 
 #pragma once
 
-#define H5_BUILT_AS_DYNAMIC_LIB
 #include <iostream>
 #include <fstream>
 #include <windows.h>
 #include <gdiplus.h>
 #include <atlstr.h>
 #include <H5Cpp.h>
+#include <Shlwapi.h>
+#include <string>
+#include <vector>
 #include <thumbcache.h>     // For IThumbnailProvider
 #include <wincodec.h>       // Windows Imaging Codecs
 
@@ -67,6 +69,8 @@ protected:
     ~HDF5ThumbnailProvider();
 
 private:
+
+	Gdiplus::Bitmap* LoadImageFromFileWithoutLocking(const WCHAR* fileName);
     // Reference count of component.
     long m_cRef;
 
