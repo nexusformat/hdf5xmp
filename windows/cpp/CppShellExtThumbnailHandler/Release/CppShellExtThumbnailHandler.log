@@ -1,0 +1,13 @@
+﻿  HDF5ThumbnailProvider.cpp
+c:\program files\hdf_group\hdf5\1.8.17\include\H5Exception.h(93): warning C4251: 'H5::Exception::detail_message': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'H5::Exception'
+  C:\Program Files\Microsoft Visual Studio 14.0\VC\include\xstring(2633): note: see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+c:\program files\hdf_group\hdf5\1.8.17\include\H5Exception.h(94): warning C4251: 'H5::Exception::func_name': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'H5::Exception'
+  C:\Program Files\Microsoft Visual Studio 14.0\VC\include\xstring(2633): note: see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+HDF5ThumbnailProvider.cpp(69): warning C4838: conversion from 'DWORD' to 'int' requires a narrowing conversion
+HDF5ThumbnailProvider.cpp(119): warning C4244: 'initializing': conversion from 'hssize_t' to 'unsigned int', possible loss of data
+     Creating library C:\Users\IEUser\projects\hdf5Thumbnails\windows\cpp\Release\CppShellExtThumbnailHandler.lib and object C:\Users\IEUser\projects\hdf5Thumbnails\windows\cpp\Release\CppShellExtThumbnailHandler.exp
+  Generating code
+  All 445 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  CppShellExtThumbnailHandler.vcxproj -> C:\Users\IEUser\projects\hdf5Thumbnails\windows\cpp\Release\CppShellExtThumbnailHandler.dll
+  CppShellExtThumbnailHandler.vcxproj -> C:\Users\IEUser\projects\hdf5Thumbnails\windows\cpp\Release\CppShellExtThumbnailHandler.pdb (Full PDB)
