@@ -34,9 +34,9 @@ WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <iostream>
 #include <fstream>
 #include <windows.h>
+#include <intrin.h>
 #include <gdiplus.h>
 #include <atlstr.h>
-#include <H5Cpp.h>
 #include <Shlwapi.h>
 #include <string>
 #include <vector>

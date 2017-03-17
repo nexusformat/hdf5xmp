@@ -109,18 +109,23 @@ HRESULT HDF5ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode) {
 IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp, 
     WTS_ALPHATYPE *pdwAlpha)
 {
+
 	pdwAlpha = 0;
-	H5::H5File file(path, H5F_ACC_RDONLY);
+	std::ifstream is(path, std::ifstream::binary);
 
-	// Gets the dataset with the thumbnail
-	H5::DataSet dataset = file.openDataSet(DATA_SET);
+	uint32_t size;
 
-	// Get image size and build char array of that size
-	unsigned int size = dataset.getSpace().getSimpleExtentNpoints();
-	char *imageData = new char[size];
+	is.seekg(0, std::ios::beg);
+	is.read(reinterpret_cast<char *>(&size), 4);
 
-	// read image into imageData
-	dataset.read(imageData, dataset.getDataType());
+	size = _byteswap_ulong(size);
+
+	char* imageData = new char[size];
+
+	is.seekg(4, std::ios::beg);
+
+	is.read(imageData, size);
+	is.close();
 
 	// write image to file
 
@@ -132,34 +137,26 @@ IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
 
 	std::wstring outfile = tempFileName;
 
+	DeleteFile((LPCWSTR)outfile.c_str());
+
 	std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
 	imageFile.write(imageData, size);
 	imageFile.close();
-
-	// Gets the path as wstring and converts that to LPCWSTR... Because Windows
-	std::wstring outstr(outfile.begin(), outfile.end());
-	LPCWSTR pathAsWindowsString;
-
-	pathAsWindowsString = (LPCWSTR)outstr.c_str();
-
-	// Sets the tempfile to hidden
-	SetFileAttributes(pathAsWindowsString, FILE_ATTRIBUTE_HIDDEN);
+	delete[] imageData;
 
 	Gdiplus::GdiplusStartupInput startupInput;
 	ULONG_PTR token;
 	Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
 
-	Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outstr.c_str());
+	Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outfile.c_str());
 
 	bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
 
 	delete bitmap;
 	// cleanup
-	delete[] imageData;
-	file.close();
 
 	DeleteFile((LPCWSTR)outfile.c_str());
-
+	
 	return S_OK;
 }
 
