@@ -3,9 +3,26 @@
 """Insert image as thumbnail into hdf5 file"""
 
 import sys
+import struct
 import os
-import h5py
 import argparse
+
+
+def read_in_chunks(file, chunk_size=1024):
+    while True:
+        data = file.read(chunk_size)
+        if not data:
+            break
+        yield data
+
+def is_power2(num):
+    return ((num & (num - 1)) == 0) and num != 0
+
+def next_power2(num):
+    i = 1
+    while i < num:
+        i *= 2
+    return i
 
 
 def main():
@@ -14,6 +31,8 @@ def main():
     parser.add_argument('hdf5File',
                         help='filename to insert the image into')
     parser.add_argument('imageFile',
+                        help='filename of the image to insert')
+    parser.add_argument('outfile',
                         help='filename of the image to insert')
     args = parser.parse_args()
 
@@ -32,16 +51,38 @@ def main():
         print("Error! Both files can't be the same")
         sys.exit()
 
+    outfile = args.outfile
+
     #  Open the hdf5 file
-    with h5py.File(args.hdf5File, 'a') as hf:
-        imgf = open(args.imageFile, 'rb')
+    with open(outfile, "wb") as of:
 
-        #  Creates a new dataSet
-        hf.create_dataset("thumb", data=bytearray(imgf.read()))
+        img = open(args.imageFile, "rb")
 
+        imageSize = os.fstat(img.fileno()).st_size
+
+        # Write the size of the image into the file
+        of.write(struct.pack('>I', int(imageSize)))
+
+        # Write the image in chunks
+        for c in read_in_chunks(img):
+            of.write(c)
+
+        currentSize = imageSize + 4
+
+        # Align the bytes for the hdf5
+        if not is_power2(currentSize):
+            of.seek(next_power2(currentSize) - 1)
+            of.write(struct.pack('b', 0))
+
+        h5 = args.hdf5File
+        hf = open(h5, "rb")
+        for c in read_in_chunks(hf):
+            of.write(c)
+            
         # close files
         hf.close()
-        imgf.close()
+        img.close()
+        of.close()
 
 
 if __name__ == "__main__":

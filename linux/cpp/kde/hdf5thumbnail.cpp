@@ -1,6 +1,11 @@
 #include "hdf5thumbnail.h"
 
-#include <H5Cpp.h>
+#include <string>
+#include <fstream>
+#include <stdlib.h>
+#include <bitset>
+#include <netinet/in.h>
+#include <iostream>
 
 #include <QImage>
 
@@ -24,24 +29,29 @@ Hdf5Creator::~Hdf5Creator() {
 
 bool Hdf5Creator::create( const QString& path, int width, int height, QImage& img ) {
 
-  // Open the file
-  H5::H5File file(path.toLocal8Bit().constData(), H5F_ACC_RDONLY);
 
-  // Gets the dataset with the thumbnail
-  H5::DataSet dataset = file.openDataSet(DATA_SET);
+  std::ifstream is (path.toStdString().c_str(), std::ifstream::binary);
 
-  // Get image size and build char array of that size
-  unsigned int size = dataset.getSpace().getSimpleExtentNpoints();
-  uchar *imageData = new uchar[size];
+  // Read the size of the image
+  uint32_t size;
+  
+  is.seekg(0, std::ios::beg);
+  is.read(reinterpret_cast<char *>(&size), 4);
 
-  // read image into imageData
-  dataset.read(imageData, dataset.getDataType());
+  size = ntohl(size);
 
+  // Read the imageData
+  char* imageData = new char[size];
+
+  is.seekg(4, std::ios::beg);
+
+  is.read(imageData, size);
+  is.close();
+  
   // fill img with loaded image
-  img.loadFromData(imageData, size, "PNG");
+  img.loadFromData((const uchar*)imageData, size, nullptr);
 
   // cleanup
-  file.close();
   delete[] imageData;
 
   return true;

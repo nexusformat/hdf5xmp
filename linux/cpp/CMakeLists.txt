@@ -48,8 +48,6 @@ if(gnome)
 
   add_executable(hdf5thumbnailer ${hdf5thumbnail_gnome_SRCS})
   
-  target_link_libraries(hdf5thumbnailer ${PROJECT_SOURCE_DIR}/lib/libhdf5_cpp.a ${PROJECT_SOURCE_DIR}/lib/libhdf5.a z dl)
-
   install(TARGETS hdf5thumbnailer DESTINATION /usr/bin)
   install(FILES gnome/hdf5.thumbnailer DESTINATION /usr/share/thumbnailers/)
   
