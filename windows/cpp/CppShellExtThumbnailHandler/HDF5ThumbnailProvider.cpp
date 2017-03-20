@@ -120,44 +120,67 @@ IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
 
 	size = _byteswap_ulong(size);
 
-	char* imageData = new char[size];
+	if (size == MAGIC_HDF) {
+		is.close();
+		return -1;
+	}
+
+	uint32_t imageHeader;
 
 	is.seekg(4, std::ios::beg);
+	is.read(reinterpret_cast<char *>(&imageHeader), 4);
 
-	is.read(imageData, size);
+	imageHeader = _byteswap_ulong(imageHeader);
+
+	if (imageHeader == MAGIC_JPG ||
+		imageHeader == MAGIC_JFIF ||
+		imageHeader == MAGIC_EXIF ||
+		imageHeader == MAGIC_GIF ||
+		imageHeader == MAGIC_PNG) {
+
+
+
+		char* imageData = new char[size];
+
+		is.seekg(4, std::ios::beg);
+
+		is.read(imageData, size);
+		is.close();
+
+		// write image to file
+
+		TCHAR tempFileName[MAX_PATH];
+		TCHAR tempPathName[MAX_PATH];
+
+		GetTempPath(MAX_PATH, tempPathName);
+		GetTempFileName(tempPathName, TEXT("HDF5ThumbnailerFile"), 1, tempFileName);
+
+		std::wstring outfile = tempFileName;
+
+		DeleteFile((LPCWSTR)outfile.c_str());
+
+		std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
+		imageFile.write(imageData, size);
+		imageFile.close();
+		delete[] imageData;
+
+		Gdiplus::GdiplusStartupInput startupInput;
+		ULONG_PTR token;
+		Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
+
+		Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outfile.c_str());
+
+		bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
+
+		delete bitmap;
+		// cleanup
+
+		DeleteFile((LPCWSTR)outfile.c_str());
+
+		return S_OK;
+	}
 	is.close();
-
-	// write image to file
-
-	TCHAR tempFileName[MAX_PATH];
-	TCHAR tempPathName[MAX_PATH];
-
-	GetTempPath(MAX_PATH, tempPathName);
-	GetTempFileName(tempPathName, TEXT("HDF5ThumbnailerFile"), 1, tempFileName);
-
-	std::wstring outfile = tempFileName;
-
-	DeleteFile((LPCWSTR)outfile.c_str());
-
-	std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
-	imageFile.write(imageData, size);
-	imageFile.close();
-	delete[] imageData;
-
-	Gdiplus::GdiplusStartupInput startupInput;
-	ULONG_PTR token;
-	Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
-
-	Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outfile.c_str());
-
-	bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
-
-	delete bitmap;
-	// cleanup
-
-	DeleteFile((LPCWSTR)outfile.c_str());
-	
-	return S_OK;
+	return -1;
 }
 
 #pragma endregion
