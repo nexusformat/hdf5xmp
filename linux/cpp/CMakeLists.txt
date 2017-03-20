@@ -28,7 +28,7 @@ if(kde)
   
   add_library(hdf5thumbnail MODULE ${hdf5thumbnail_kde_SRCS})
   
-  target_link_libraries(hdf5thumbnail Qt5::Gui KF5::KIOWidgets KF5::Archive ${PROJECT_SOURCE_DIR}/lib/libhdf5_hl.a ${PROJECT_SOURCE_DIR}/lib/libhdf5_cpp.a  ${PROJECT_SOURCE_DIR}/lib/libhdf5.a z dl)
+  target_link_libraries(hdf5thumbnail KF5::KIOWidgets)
 
   set(LIBRARY_INSTALL_DIR /usr/lib/qt5/plugins/)
 

@@ -1,15 +1,18 @@
 #include "hdf5thumbnail.h"
 
-#include <string>
 #include <fstream>
-#include <stdlib.h>
-#include <bitset>
 #include <netinet/in.h>
-#include <iostream>
 
 #include <QImage>
 
-#define DATA_SET "thumb"
+// Defines the magic header value of different file-types
+#define MAGIC_HDF  0x89484446
+#define MAGIC_JPG  0xffd8ffd8
+#define MAGIC_JFIF 0xffd8ffe0
+#define MAGIC_EXIF 0xffd8ffe1
+// This isn't the full magic numberbut there isn't any other starting like that anyways
+#define MAGIC_GIF  0x47494638
+#define MAGIC_PNG  0x89504e47
 
 // Configuration for KDE plugin creation
 extern "C" {
@@ -40,21 +43,46 @@ bool Hdf5Creator::create( const QString& path, int width, int height, QImage& im
 
   size = ntohl(size);
 
-  // Read the imageData
-  char* imageData = new char[size];
+  if(size == MAGIC_HDF) {
+    is.close();
+    return false;
+  }
+
+  // Check for the image-headers
+  // If the image-header is missing then it isn't a thumbnail or a unsupported image-format
+  uint32_t imageHeader;
 
   is.seekg(4, std::ios::beg);
+  is.read(reinterpret_cast<char *>(&imageHeader), 4);
 
-  is.read(imageData, size);
-  is.close();
+  imageHeader = ntohl(imageHeader);
+
+  // Check if the imageHeader is one of the approved headers
+  if(imageHeader == MAGIC_JPG ||
+     imageHeader == MAGIC_JFIF ||
+     imageHeader == MAGIC_EXIF ||
+     imageHeader == MAGIC_GIF ||
+     imageHeader == MAGIC_PNG) {
+
   
-  // fill img with loaded image
-  img.loadFromData((const uchar*)imageData, size, nullptr);
+    // Read the imageData
+    char* imageData = new char[size];
 
-  // cleanup
-  delete[] imageData;
+    is.seekg(4, std::ios::beg);
 
-  return true;
+    is.read(imageData, size);
+    is.close();
+
+    // fill img with loaded image
+    img.loadFromData((const uchar*)imageData, size, nullptr);
+
+    // cleanup
+    delete[] imageData;
+
+    return true;
+  }
+  is.close();
+  return false;
 }
 
 ThumbCreator::Flags Hdf5Creator::flags() const {
