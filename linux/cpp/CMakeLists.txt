@@ -1,6 +1,5 @@
 project(hdf5thumbnail)
 cmake_minimum_required(VERSION 3.3.1)
-set(QT_MIN_VERSION "5.2.0")
 
 find_package(ECM 1.0.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -8,10 +7,6 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_S
 option(gnome "If you have gnome installed" ON)
 option(kde "If you have kde installed" ON)
 
-find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Gui)
-
-include(FeatureSummary)
-include(WriteBasicConfigVersionFile)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
@@ -22,7 +17,7 @@ if(kde)
   
   add_subdirectory(kde)
 
-  find_package(KF5 REQUIRED COMPONENTS KIO Archive)
+  find_package(KF5 REQUIRED COMPONENTS KIO)
 
   set(hdf5thumbnail_kde_SRCS kde/hdf5thumbnail.cpp)
   
