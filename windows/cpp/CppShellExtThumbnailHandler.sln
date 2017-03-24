@@ -1,8 +1,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppShellExtThumbnailHandler", "CppShellExtThumbnailHandler\CppShellExtThumbnailHandler.vcxproj", "{145AB33E-71A1-42C3-8223-E107CFC162F4}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ThumbnailerInstaller", "Setup1\Setup1.vdproj", "{8F921627-F178-4447-98E3-D772D0C34383}"
+	ProjectSection(ProjectDependencies) = postProject
+		{145AB33E-71A1-42C3-8223-E107CFC162F4} = {145AB33E-71A1-42C3-8223-E107CFC162F4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +25,12 @@ Global
 		{145AB33E-71A1-42C3-8223-E107CFC162F4}.Release|Win32.Build.0 = Release|Win32
 		{145AB33E-71A1-42C3-8223-E107CFC162F4}.Release|x64.ActiveCfg = Release|x64
 		{145AB33E-71A1-42C3-8223-E107CFC162F4}.Release|x64.Build.0 = Release|x64
+		{8F921627-F178-4447-98E3-D772D0C34383}.Debug|Win32.ActiveCfg = Debug
+		{8F921627-F178-4447-98E3-D772D0C34383}.Debug|x64.ActiveCfg = Debug
+		{8F921627-F178-4447-98E3-D772D0C34383}.Release|Win32.ActiveCfg = Release
+		{8F921627-F178-4447-98E3-D772D0C34383}.Release|Win32.Build.0 = Release
+		{8F921627-F178-4447-98E3-D772D0C34383}.Release|Win32.Deploy.0 = Release
+		{8F921627-F178-4447-98E3-D772D0C34383}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
