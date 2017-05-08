@@ -33,7 +33,7 @@ def main():
     parser.add_argument('imageFile',
                         help='filename of the image to insert')
     parser.add_argument('outfile',
-                        help='filename of the image to insert')
+                        help='filename of the output where the hdf5 with thumbnail should be saved')
     args = parser.parse_args()
 
     #  Checks if the hdf5File exists
