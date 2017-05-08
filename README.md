@@ -67,13 +67,23 @@ If you only want one of the versions you should disable the other one (especiall
 this is done by using CMake arguments.
 
 ```
-  -DKDE       # Whether or not to build the KDE Version (Default: -DKDE=ON, To disable: -DKDE=OFF)
-  -DGNOME     # Whether or not to build the GNOME Version (Default: -DGNOME=ON, To disable: -DGNOME=OFF)
+  -Dkde       # Whether or not to build the KDE Version (Default: -Dkde=ON, To disable: -Dkde=OFF)
+  -Dgnome     # Whether or not to build the GNOME Version (Default: -Dgnome=ON, To disable: -Dgnome=OFF)
 ```
 
 To build the thumbnailer you need to create a _build_ folder and then execute CMake with the appropriate arguments.
 
-After building the thumbnailer it's a simple matter of using ```make install``` in the build directory.
+After building the thumbnailer it's a simple matter of using ```sudo make install``` in the build directory.
+
+Example for GNOME only:
+
+```
+  cd linux
+  mkdir build
+  cd build
+  cmake -Dkde=off ..
+  sudo make install
+```
 
 ### Windows
 
