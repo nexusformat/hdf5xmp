@@ -78,7 +78,8 @@ After building the thumbnailer it's a simple matter of using ```make install``` 
 ### Windows
 
 To build the Windows version you need to have Visual-Studio 2017 and VCRedist installed.
-To build the installer for the thumbnailer you need the _Microsoft Visual Studio 2017 Installer Projects_ plugin for Visual-Studio.
+To build the installer for the thumbnailer you need the
+[_Microsoft Visual Studio 2017 Installer Projects_](https://marketplace.visualstudio.com/items?itemName=VisualStudioProductTeam.MicrosoftVisualStudio2017InstallerProjects) plugin for Visual-Studio.
 
 When you have the requirements installed, you can open the solution in the _windows_ folder with Visual-Studio.
 
