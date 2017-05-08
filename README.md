@@ -68,7 +68,7 @@ this is done by using CMake arguments.
 
 ```
   -DKDE       # Whether or not to build the KDE Version (Default: -DKDE=ON, To disable: -DKDE=OFF)
-  -DGNOME     # Weather or not to build the GNOME Version (Default: -DGNOME=ON, To disable: -DGNOME=OFF)
+  -DGNOME     # Whether or not to build the GNOME Version (Default: -DGNOME=ON, To disable: -DGNOME=OFF)
 ```
 
 To build the thumbnailer you need to create a _build_ folder and then execute CMake with the appropriate arguments.
