@@ -1,69 +1,77 @@
 #include <fstream>
+#include <iostream>
 #include <netinet/in.h>
+#include "tinyxml2.h"
+#include "base64.h"
 
-// Defines the magic header value of different file-types
-#define MAGIC_HDF  0x89484446
-#define MAGIC_JPG  0xffd8ffd8
-#define MAGIC_JFIF 0xffd8ffe0
-#define MAGIC_EXIF 0xffd8ffe1
-// This isn't the full magic numberbut there isn't any other starting like that anyways
-#define MAGIC_GIF  0x47494638
-#define MAGIC_PNG  0x89504e47
+#define HDF_FILE_ENDING ".hdf5"
+
+constexpr int FILE_END_LENGTH = sizeof(HDF_FILE_ENDING) - 1;
+
 
 int main(int argc, char* argv[]) {
+
+  if(argc <= 2) {
+    std::cerr << "Error: Invalid number of arguments" << std::endl;
+    return -1;
+  }
   
   std::string path = argv[1];
 
-  std::ifstream is (path.c_str(), std::ifstream::binary);
+  // Check if the file ends with '.hdf5'
+  if(path.rfind(HDF_FILE_ENDING) == path.length() - FILE_END_LENGTH) {
+    // If yes. Remove the file ending
+    path = path.substr(0, path.length() - FILE_END_LENGTH);
+  }
+  path += ".xmp";
 
-  // Read the size of the image
-  uint32_t size;
+  tinyxml2::XMLDocument xmp;
+
+  xmp.LoadFile(path.c_str());
+
+  if(xmp.Error()) {
+    std::cerr << "Error: " << xmp.ErrorName() << std::endl;
+    return xmp.ErrorID();
+  }
+
+  // Get The first Element in the /x:xmpmeta/rdf:RDF tag
+  // This is done with the safe assumption that the XMP file has that hirarchy
+  tinyxml2::XMLElement* currentElement = xmp.RootElement()->FirstChildElement()->FirstChildElement();
+
+  do {
+    // Try to find the tag containing the image-data
+    if(!currentElement->NoChildren()) {
+      // If it has a tag with this name it should take the first element of the list it contains
+      if(currentElement->FirstChildElement("xap:Thumbnails")) {
+        tinyxml2::XMLElement* thumbnailsTag = currentElement->FirstChildElement("xap:Thumbnails");
+        
+        if(!thumbnailsTag->NoChildren()) {
+          tinyxml2::XMLElement* thumbnailList = thumbnailsTag->FirstChildElement();
+          
+          if(!thumbnailList->NoChildren()) {
+            tinyxml2::XMLElement* thumbnailTag = thumbnailList->FirstChildElement();
+            
+            if(thumbnailTag->FirstChildElement("xapGImg:image")) {
+              // Decode the base64 image-data
+              const char* base64Data = thumbnailTag->FirstChildElement("xapGImg:image")->GetText();
+              std::string binaryData = base64_decode(base64Data);
+
+              // Write it to the file
+              std::fstream imageFile(argv[2], std::ios::out | std::ios::binary);
+              imageFile.write(binaryData.c_str(), binaryData.length());
+              imageFile.close();
+
+              return 0;
+            }
+          }
+        }
+      }
+    }
+    // Go to the next element
+    currentElement = currentElement->NextSiblingElement();
+  } while(currentElement);
+
+  std::cerr << "Error: Image data not found" << std::endl;
   
-  is.seekg(0, std::ios::beg);
-  is.read(reinterpret_cast<char *>(&size), 4);
-
-  size = ntohl(size);
-
-  // If the header of the files is the one of a HDF file then abort
-  if(size == MAGIC_HDF) {
-    is.close();
-    return -1;
-  }
-
-  // Check for the image-headers
-  // If the image-header is missing then it isn't a thumbnail or a unsupported image-format
-  uint32_t imageHeader;
-
-  is.seekg(4, std::ios::beg);
-  is.read(reinterpret_cast<char *>(&imageHeader), 4);
-
-  imageHeader = ntohl(imageHeader);
-
-  // Check if the imageHeader is one of the approved headers
-  if(imageHeader == MAGIC_JPG ||
-     imageHeader == MAGIC_JFIF ||
-     imageHeader == MAGIC_EXIF ||
-     imageHeader == MAGIC_GIF ||
-     imageHeader == MAGIC_PNG) {
-
-
-    // Read the imageData
-    char* imageData = new char[size];
-
-    is.seekg(4, std::ios::beg);
-
-    is.read(imageData, size);
-    is.close();
-
-    // write image to file
-    std::fstream imageFile(argv[2], std::ios::out | std::ios::binary);
-    imageFile.write(imageData, size);
-    imageFile.close();
-
-    delete[] imageData;
-
-    return 0;
-  }
-  is.close();
   return -1;
 }
