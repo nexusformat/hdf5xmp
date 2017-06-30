@@ -7,12 +7,9 @@ import struct
 import os
 import argparse
 import math
+import base64
 
 MAGIC_HDF = 0x89484446
-
-# 00000000: 8954 484d 4235      .THMB5
-MAGIC_THUMB = [0x8954, 0x484d, 0x4235]
-
 
 def read_in_chunks(file, chunk_size=1024):
     while True:
@@ -35,38 +32,28 @@ def check_hdf_header(file, location):
     sig = file.read(4)
     return int.from_bytes(sig, byteorder="big") == MAGIC_HDF
 
+def get_xmp_from_image(imageFile):
+    # Remove the quotes and leading b from the string
+    base64Image = str(base64.b64encode(imageFile.read())).strip("b'").strip("'")
+    # Get the xmp template
+    path = os.path.dirname(os.path.abspath(__file__)) + "/template.xmp"
 
-def write_signature(file):
-    for magic_byte in MAGIC_THUMB:
-        file.write(struct.pack(">H", magic_byte))
+    with open(path, "r") as xmpFile:
+        xmp = xmpFile.read()
+
+        extension = os.path.splitext(os.path.abspath(imageFile.name))[1];
+        extension = extension.split(".")[-1]
+        xmp = xmp.replace("{{IMAGE_FORMAT}}", extension.upper())
+
+        # Insert the data
+        xmp = xmp.replace("{{IMAGE_DATA_BASE64}}", base64Image)
+
+        return xmp
+    
 
 
-def main():
-
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('hdf5File',
-                        help='filename to insert the image into')
-    parser.add_argument('imageFile',
-                        help='filename of the image to insert')
-    parser.add_argument('outfile',
-                        help='filename of the output where the hdf5 with thumbnail should be saved')
-    args = parser.parse_args()
-
-    #  Checks if the hdf5File exists
-    if(not os.path.isfile(args.hdf5File)):
-        print("Error " + args.hdf5File + " is not a file")
-        sys.exit()
-
-    #  Checks if the imageFile exists
-    if(not os.path.isfile(args.imageFile)):
-        print("Error " + args.imageFile + " is not a file")
-        sys.exit()
-
-    #  Makes sure that both files aren't the same
-    if(args.hdf5File == args.imageFile):
-        print("Error! Both files can't be the same")
-        sys.exit()
-
+def write_into_userblock(args):
+    
     with open(args.hdf5File, "rb") as hf:
 
         # Check if the file is a HDF5-File
@@ -81,22 +68,10 @@ def main():
 
         hf.seek(0)
 
-        # If the hdf5 file has no user block
-        if i == 0:
-            of = open(args.outfile, "wb")
-            # Write the thumbnail signature
-            write_signature(of)
-
-            # Write the imagesize
-            img = open(args.imageFile, "rb")
-            imageSize = os.fstat(img.fileno()).st_size
-            of.write(struct.pack(">I", int(imageSize)))
-
-            # Write the image chunkwise
-            for c in read_in_chunks(img):
-                of.write(c)
-
-            img.close()
+        with open(args.outfile, "wb") as of:
+            of.write(hf.read(i))
+            with open(args.imageFile, "rb") as img:
+                of.write(bytearray(get_xmp_from_image(img), encoding="utf-8"))
 
             # Go to the next power of 2
             if not is_power2(of.tell()):
@@ -106,40 +81,51 @@ def main():
             for c in read_in_chunks(hf):
                 of.write(c)
 
-            of.close()
+def write_into_sidecar(args):
+    h5FileName = os.path.splitext(os.path.abspath(args.hdf5File))[0];
+    path = h5FileName + ".xmp"
+    if(args.outfile != None):
+        path = args.outfile
 
-        hf.close()
+    with open(path, "w") as of:
+        with open(args.imageFile, "rb") as img:
+            of.write(get_xmp_from_image(img))
 
-    #  Open the hdf5 file
-#    with open(outfile, "wb") as of:
 
-#        img = open(args.imageFile, "rb")
+def main():
 
-#        imageSize = os.fstat(img.fileno()).st_size
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('hdf5File',
+                        help='filename to insert the image into')
+    parser.add_argument('imageFile',
+                        help='filename of the image to insert')
+    parser.add_argument('outfile', nargs='?',
+                        help='filename of the output file. Only required when using without --sidecar')
+    parser.add_argument('--sidecar', action='store_true')
+    args = parser.parse_args()
 
-        # Write the size of the image into the file
-#        of.write(struct.pack('>I', int(imageSize)))
+    #  Checks if the hdf5File exists
+    if(not os.path.isfile(args.hdf5File)):
+        print("Error " + args.hdf5File + " is not a file")
+        sys.exit(-1)
 
-        # Write the image in chunks
-#        for c in read_in_chunks(img):
-#            of.write(c)
+    #  Checks if the imageFile exists
+    if(not os.path.isfile(args.imageFile)):
+        print("Error " + args.imageFile + " is not a file")
+        sys.exit(-1)
 
-#        currentSize = imageSize + 4
+    #  Makes sure that both files aren't the same
+    if(args.hdf5File == args.imageFile):
+        print("Error! Both files can't be the same")
+        sys.exit(-1)
 
-        # Align the bytes for the hdf5
-#        if not is_power2(currentSize):
-#            of.seek(next_power2(currentSize) - 1)
-#            of.write(struct.pack('b', 0))
-
-#        h5 = args.hdf5File
-#        hf = open(h5, "rb")
-#        for c in read_in_chunks(hf):
-#            of.write(c)
-            
-#        # close files
-#        hf.close()
-#        img.close()
-#        of.close()
+    if(not args.sidecar):
+        if(args.outfile == None):
+            print("Error! Outfile argument required when using without --sidecar")
+            sys.exit(-1)
+        write_into_userblock(args)
+    else:
+        write_into_sidecar(args)
 
 
 if __name__ == "__main__":
