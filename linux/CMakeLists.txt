@@ -13,18 +13,16 @@ include(KDECompilerSettings)
 
 add_definitions("-fPIC -O3")
 
-add_library(base64 STATIC base64.cpp)
-add_library(tinyXML2 STATIC tinyxml2.cpp)
-add_library(thumbnailerCore STATIC thumbnailerCore.cpp)
+add_library(base64 STATIC ../common/base64.cpp)
+add_library(tinyXML2 STATIC ../common/tinyxml2.cpp)
+add_library(thumbnailerCore STATIC ../common/thumbnailerCore.cpp)
 target_link_libraries(thumbnailerCore tinyXML2 base64)
-include_directories(.)
+include_directories(../common/)
 
 if(kde)
 
   message("KDE enabled")
   
-  add_subdirectory(kde)
-
   find_package(KF5 REQUIRED COMPONENTS KIO)
 
   set(hdf5thumbnail_kde_SRCS kde/hdf5thumbnail.cpp)
@@ -43,9 +41,6 @@ endif()
 if(gnome)
 
   message("GNOME enabled")
-
-
-  add_subdirectory(gnome)
 
   set(hdf5thumbnail_gnome_SRCS gnome/hdf5thumbnail.cpp)
   

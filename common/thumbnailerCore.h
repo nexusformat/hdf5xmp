@@ -1,4 +1,4 @@
-#ifndef HDF5THUMBNAIL_COREH
+#ifndef HDF5THUMBNAIL_CORE_H
 #define HDF5THUMBNAIL_CORE_H
 
 #include <fstream>

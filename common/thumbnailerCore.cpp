@@ -49,7 +49,7 @@ std::string readXmpFromSidecar(std::string path) {
   }
   path += ".xmp";
 
-  std::fstream xmpFile(path, std::ios::in | std::ios::ate);
+  std::ifstream xmpFile(path, std::ios::in | std::ios::ate);
   std::streamsize size = xmpFile.tellg();
   xmpFile.seekg(0);
   
