@@ -11,6 +11,8 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 
+add_definitions("-fPIC -O3")
+
 add_library(base64 STATIC base64.cpp)
 add_library(tinyXML2 STATIC tinyxml2.cpp)
 add_library(thumbnailerCore STATIC thumbnailerCore.cpp)
@@ -26,8 +28,6 @@ if(kde)
   find_package(KF5 REQUIRED COMPONENTS KIO)
 
   set(hdf5thumbnail_kde_SRCS kde/hdf5thumbnail.cpp)
-
-  add_definitions("-fPIC")
   
   add_library(hdf5thumbnail MODULE ${hdf5thumbnail_kde_SRCS})
   
