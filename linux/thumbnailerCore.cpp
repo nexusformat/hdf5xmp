@@ -106,7 +106,7 @@ std::string readFromHdfFile(std::string path) {
   return findImageData(xmp);
 }
 
-std::string getThumbnail(std::string& path) {
+std::string getThumbnail(std::string path) {
   std::string binaryData = readFromHdfFile(path);
 
   if(binaryData.length() == 0) {

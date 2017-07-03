@@ -1,3 +1,6 @@
+#ifndef HDF5THUMBNAIL_COREH
+#define HDF5THUMBNAIL_CORE_H
+
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -17,4 +20,6 @@ const std::string XMP_HEADER_FOOTER_REGEX = "(<\\?xpacket begin=(\"|')(.?.?.?)(\
   "id=(\"|')W5M0MpCehiHzreSzNTczkc9d(\"|')\\?>)|"
   "(<\\?xpacket end=(\"|')(w|r)(\"|')\\?>)";
 
-std::string getThumbnail(std::string& path);
+std::string getThumbnail(std::string path);
+
+#endif

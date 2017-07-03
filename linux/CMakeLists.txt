@@ -26,6 +26,8 @@ if(kde)
   find_package(KF5 REQUIRED COMPONENTS KIO)
 
   set(hdf5thumbnail_kde_SRCS kde/hdf5thumbnail.cpp)
+
+  add_definitions("-fPIC")
   
   add_library(hdf5thumbnail MODULE ${hdf5thumbnail_kde_SRCS})
   
