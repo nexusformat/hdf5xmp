@@ -50,12 +50,12 @@ std::string readXmpFromSidecar(std::string path) {
   path += ".xmp";
 
   std::ifstream xmpFile(path, std::ios::in | std::ios::ate);
+  if (!xmpFile.good()) {
+	  return "";
+  }
   std::streamsize size = xmpFile.tellg();
   xmpFile.seekg(0);
 
-  if (size == -1) {
-	  return "";
-  }
   
   std::vector<char> buffer(size);
   xmpFile.read(buffer.data(), size);
