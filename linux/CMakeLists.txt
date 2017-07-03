@@ -13,6 +13,8 @@ include(KDECompilerSettings)
 
 add_library(base64 STATIC base64.cpp)
 add_library(tinyXML2 STATIC tinyxml2.cpp)
+add_library(thumbnailerCore STATIC thumbnailerCore.cpp)
+target_link_libraries(thumbnailerCore tinyXML2 base64)
 include_directories(.)
 
 if(kde)
@@ -27,7 +29,7 @@ if(kde)
   
   add_library(hdf5thumbnail MODULE ${hdf5thumbnail_kde_SRCS})
   
-  target_link_libraries(hdf5thumbnail KF5::KIOWidgets tinyXML2 base64)
+  target_link_libraries(hdf5thumbnail KF5::KIOWidgets thumbnailerCore)
 
   set(LIBRARY_INSTALL_DIR /usr/lib/qt5/plugins/)
 
@@ -47,7 +49,7 @@ if(gnome)
   
   add_executable(hdf5thumbnailer ${hdf5thumbnail_gnome_SRCS})
 
-  target_link_libraries(hdf5thumbnailer tinyXML2 base64)
+  target_link_libraries(hdf5thumbnailer thumbnailerCore)
   
   install(TARGETS hdf5thumbnailer DESTINATION /usr/bin)
   install(FILES gnome/hdf5.thumbnailer DESTINATION /usr/share/thumbnailers/)
