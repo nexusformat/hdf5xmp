@@ -4,7 +4,9 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#ifndef WIN32
 #include <netinet/in.h>
+#endif
 #include "tinyxml2.h"
 #include "base64.h"
 

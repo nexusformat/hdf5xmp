@@ -3,29 +3,29 @@ Module Name:  HDF5ThumbnailProvider.cpp
 Project:      CppShellExtThumbnailHandler
 Copyright (c) Microsoft Corporation.
 
-The code sample demonstrates the C++ implementation of a thumbnail handler 
-for a new file type registered with the .HDF5 extension. 
+The code sample demonstrates the C++ implementation of a thumbnail handler
+for a new file type registered with the .HDF5 extension.
 
-A thumbnail image handler provides an image to represent the item. It lets you 
-customize the thumbnail of files with a specific file extension. Windows Vista 
-and newer operating systems make greater use of file-specific thumbnail images 
-than earlier versions of Windows. Thumbnails of 32-bit resolution and as large 
-as 256x256 pixels are often used. File format owners should be prepared to 
-display their thumbnails at that size. 
+A thumbnail image handler provides an image to represent the item. It lets you
+customize the thumbnail of files with a specific file extension. Windows Vista
+and newer operating systems make greater use of file-specific thumbnail images
+than earlier versions of Windows. Thumbnails of 32-bit resolution and as large
+as 256x256 pixels are often used. File format owners should be prepared to
+display their thumbnails at that size.
 
-The example thumbnail handler implements the IInitializeWithStream and 
-IThumbnailProvider interfaces, and provides thumbnails for .HDF5 files. 
-The .HDF5 file type is simply an XML file registered as a unique file name 
-extension. It includes an element called "Picture", embedding an image file. 
-The thumbnail handler extracts the embedded image and asks the Shell to 
+The example thumbnail handler implements the IInitializeWithStream and
+IThumbnailProvider interfaces, and provides thumbnails for .HDF5 files.
+The .HDF5 file type is simply an XML file registered as a unique file name
+extension. It includes an element called "Picture", embedding an image file.
+The thumbnail handler extracts the embedded image and asks the Shell to
 display it as a thumbnail.
 
 This source is subject to the Microsoft Public License.
 See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
 All other rights reserved.
 
-THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
-EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED 
+THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 \*******************************************************************************/
 
@@ -46,13 +46,13 @@ extern long g_cDllRef;
 
 HDF5ThumbnailProvider::HDF5ThumbnailProvider() : m_cRef(1), path("")
 {
-    InterlockedIncrement(&g_cDllRef);
+	InterlockedIncrement(&g_cDllRef);
 }
 
 
 HDF5ThumbnailProvider::~HDF5ThumbnailProvider()
 {
-    InterlockedDecrement(&g_cDllRef);
+	InterlockedDecrement(&g_cDllRef);
 }
 
 
@@ -61,31 +61,31 @@ HDF5ThumbnailProvider::~HDF5ThumbnailProvider()
 // Query to the interface the component supported.
 IFACEMETHODIMP HDF5ThumbnailProvider::QueryInterface(REFIID riid, void **ppv)
 {
-    static const QITAB qit[] = 
-    {
-        QITABENT(HDF5ThumbnailProvider, IThumbnailProvider),
-        QITABENT(HDF5ThumbnailProvider, IInitializeWithFile), 
-        { 0 },
-    };
-    return QISearch(this, qit, riid, ppv);
+	static const QITAB qit[] =
+	{
+		QITABENT(HDF5ThumbnailProvider, IThumbnailProvider),
+		QITABENT(HDF5ThumbnailProvider, IInitializeWithFile),
+		{ 0 },
+	};
+	return QISearch(this, qit, riid, ppv);
 }
 
 // Increase the reference count for an interface on an object.
 IFACEMETHODIMP_(ULONG) HDF5ThumbnailProvider::AddRef()
 {
-    return InterlockedIncrement(&m_cRef);
+	return InterlockedIncrement(&m_cRef);
 }
 
 // Decrease the reference count for an interface on an object.
 IFACEMETHODIMP_(ULONG) HDF5ThumbnailProvider::Release()
 {
-    ULONG cRef = InterlockedDecrement(&m_cRef);
-    if (0 == cRef)
-    {
-        delete this;
-    }
+	ULONG cRef = InterlockedDecrement(&m_cRef);
+	if (0 == cRef)
+	{
+		delete this;
+	}
 
-    return cRef;
+	return cRef;
 }
 
 #pragma endregion
@@ -106,81 +106,49 @@ HRESULT HDF5ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode) {
 
 #pragma region IThumbnailProvider
 
-IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp, 
-    WTS_ALPHATYPE *pdwAlpha)
+IFACEMETHODIMP HDF5ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP *phbmp,
+	WTS_ALPHATYPE *pdwAlpha)
 {
 
 	pdwAlpha = 0;
-	std::ifstream is(path, std::ifstream::binary);
 
-	uint32_t size;
+	std::string binaryData = getThumbnail(path);
 
-	is.seekg(0, std::ios::beg);
-	is.read(reinterpret_cast<char *>(&size), 4);
-
-	size = _byteswap_ulong(size);
-
-	if (size == MAGIC_HDF) {
-		is.close();
-		return -1;
+	if (binaryData.length() == 0) {
+		std::cerr << "No thumbnails found" << std::endl;
+		return S_FALSE;
 	}
+	const char* imageData = binaryData.c_str();
 
-	uint32_t imageHeader;
+	TCHAR tempFileName[MAX_PATH];
+	TCHAR tempPathName[MAX_PATH];
 
-	is.seekg(4, std::ios::beg);
-	is.read(reinterpret_cast<char *>(&imageHeader), 4);
+	GetTempPath(MAX_PATH, tempPathName);
+	GetTempFileName(tempPathName, TEXT("HDF5ThumbnailerFile"), 1, tempFileName);
 
-	imageHeader = _byteswap_ulong(imageHeader);
+	std::wstring outfile = tempFileName;
 
-	if (imageHeader == MAGIC_JPG ||
-		imageHeader == MAGIC_JFIF ||
-		imageHeader == MAGIC_EXIF ||
-		imageHeader == MAGIC_GIF ||
-		imageHeader == MAGIC_PNG) {
+	DeleteFile((LPCWSTR)outfile.c_str());
+
+	std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
+	imageFile.write(imageData, binaryData.size());
+	imageFile.close();
+
+	Gdiplus::GdiplusStartupInput startupInput;
+	ULONG_PTR token;
+	Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
+
+	Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outfile.c_str());
+
+	bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
+
+	delete bitmap;
+	// cleanup
+
+	DeleteFile((LPCWSTR)outfile.c_str());
 
 
-
-		char* imageData = new char[size];
-
-		is.seekg(4, std::ios::beg);
-
-		is.read(imageData, size);
-		is.close();
-
-		// write image to file
-
-		TCHAR tempFileName[MAX_PATH];
-		TCHAR tempPathName[MAX_PATH];
-
-		GetTempPath(MAX_PATH, tempPathName);
-		GetTempFileName(tempPathName, TEXT("HDF5ThumbnailerFile"), 1, tempFileName);
-
-		std::wstring outfile = tempFileName;
-
-		DeleteFile((LPCWSTR)outfile.c_str());
-
-		std::fstream imageFile(outfile, std::ios::out | std::ios::binary);
-		imageFile.write(imageData, size);
-		imageFile.close();
-		delete[] imageData;
-
-		Gdiplus::GdiplusStartupInput startupInput;
-		ULONG_PTR token;
-		Gdiplus::GdiplusStartup(&token, &startupInput, NULL);
-
-		Gdiplus::Bitmap* bitmap = LoadImageFromFileWithoutLocking(outfile.c_str());
-
-		bitmap->GetHBITMAP(Gdiplus::Color::White, phbmp);
-
-		delete bitmap;
-		// cleanup
-
-		DeleteFile((LPCWSTR)outfile.c_str());
-
-		return S_OK;
-	}
-	is.close();
-	return -1;
+	return S_OK;
 }
 
 #pragma endregion

@@ -52,13 +52,16 @@ std::string readXmpFromSidecar(std::string path) {
   std::ifstream xmpFile(path, std::ios::in | std::ios::ate);
   std::streamsize size = xmpFile.tellg();
   xmpFile.seekg(0);
+
+  if (size == -1) {
+	  return "";
+  }
   
-  char* buffer = new char[size];
-  xmpFile.read(buffer, size);
+  std::vector<char> buffer(size);
+  xmpFile.read(buffer.data(), size);
   xmpFile.close();
 
-  std::string xml = removeXMPHeaders(buffer);
-  delete[] buffer;
+  std::string xml = removeXMPHeaders(buffer.data());
 
 
   tinyxml2::XMLDocument xmp;
@@ -80,7 +83,11 @@ std::string readFromHdfFile(std::string path) {
   // Check if the file has xmp data
   uint32_t header;
   file.read(reinterpret_cast<char *>(&header), 4);
+#ifndef WIN32
   header = ntohl(header);
+#else
+  header = _byteswap_ulong(header);
+#endif
 
   if(header == MAGIC_HDF) {
     file.close();
