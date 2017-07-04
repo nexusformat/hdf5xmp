@@ -2,6 +2,11 @@
 
 This is a thumbnail-provider for Windows
 
+## Developing
+
+The thumbnail-provider is a Visual Studio 2017 Community Edition project and should work directly by opening the .sln file.
+
+You may need to add the ```common``` Folder to the Include path in the Project for it to compile.
 
 ## Install
 
