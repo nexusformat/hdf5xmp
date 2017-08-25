@@ -3,7 +3,6 @@
 """Insert image as thumbnail into hdf5 file"""
 
 import sys
-import struct
 import os
 import argparse
 import math
@@ -32,7 +31,7 @@ def check_hdf_header(file, location):
     sig = file.read(4)
     return int.from_bytes(sig, byteorder="big") == MAGIC_HDF
 
-def get_xmp_from_image(imageFile):
+def construct_xmp_file(imageFile, key_value_data):
     # Remove the quotes and leading b from the string
     base64Image = str(base64.b64encode(imageFile.read())).strip("b'").strip("'")
     # Get the xmp template
@@ -41,19 +40,30 @@ def get_xmp_from_image(imageFile):
     with open(path, "r") as xmpFile:
         xmp = xmpFile.read()
 
-        extension = os.path.splitext(os.path.abspath(imageFile.name))[1];
+        extension = os.path.splitext(os.path.abspath(imageFile.name))[1]
         extension = extension.split(".")[-1]
         xmp = xmp.replace("{{IMAGE_FORMAT}}", extension.upper())
 
         # Insert the data
         xmp = xmp.replace("{{IMAGE_DATA_BASE64}}", base64Image)
 
+        # Insert the Key_Value pairs if they are given
+        if key_value_data is not None:
+            key_value_string = ''
+            for pair in key_value_data:
+                key_value_string += '<xap:' + pair[0] + '>' + pair[1] \
+                    + '</xap:' + pair[0] + '>'
+            
+            xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', key_value_string)
+        else:
+            xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', '');
+
         return xmp
-    
+
 
 
 def write_into_userblock(args):
-    
+
     with open(args.hdf5File, "rb") as hf:
 
         # Check if the file is a HDF5-File
@@ -71,7 +81,7 @@ def write_into_userblock(args):
         with open(args.outfile, "wb") as of:
             of.write(hf.read(i))
             with open(args.imageFile, "rb") as img:
-                of.write(bytearray(get_xmp_from_image(img), encoding="utf-8"))
+                of.write(bytearray(construct_xmp_file(img, args.data), encoding="utf-8"))
 
             # Go to the next power of 2
             if not is_power2(of.tell()):
@@ -82,14 +92,14 @@ def write_into_userblock(args):
                 of.write(c)
 
 def write_into_sidecar(args):
-    h5FileName = os.path.splitext(os.path.abspath(args.hdf5File))[0];
+    h5FileName = os.path.splitext(os.path.abspath(args.hdf5File))[0]
     path = h5FileName + ".xmp"
-    if(args.outfile != None):
+    if args.outfile != None:
         path = args.outfile
 
     with open(path, "w") as of:
         with open(args.imageFile, "rb") as img:
-            of.write(get_xmp_from_image(img))
+            of.write(construct_xmp_file(img, args.data))
 
 
 def main():
@@ -101,26 +111,30 @@ def main():
                         help='filename of the image to insert')
     parser.add_argument('outfile', nargs='?',
                         help='filename of the output file. Only required when using without --sidecar')
+    parser.add_argument('-d', '--data', action='append', nargs=2,
+                        help='custom user-defined Key-Value pairs')
     parser.add_argument('--sidecar', action='store_true')
     args = parser.parse_args()
 
     #  Checks if the hdf5File exists
-    if(not os.path.isfile(args.hdf5File)):
+    if not os.path.isfile(args.hdf5File):
         print("Error " + args.hdf5File + " is not a file")
         sys.exit(-1)
 
     #  Checks if the imageFile exists
-    if(not os.path.isfile(args.imageFile)):
+    if not os.path.isfile(args.imageFile):
         print("Error " + args.imageFile + " is not a file")
         sys.exit(-1)
 
     #  Makes sure that both files aren't the same
-    if(args.hdf5File == args.imageFile):
+    if args.hdf5File == args.imageFile:
         print("Error! Both files can't be the same")
         sys.exit(-1)
 
-    if(not args.sidecar):
-        if(args.outfile == None):
+    print(args.data)
+
+    if not args.sidecar:
+        if args.outfile is None:
             print("Error! Outfile argument required when using without --sidecar")
             sys.exit(-1)
         write_into_userblock(args)
