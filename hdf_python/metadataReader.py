@@ -15,7 +15,10 @@ import sys
 
 import xmltodict
 
-import thumbnailInserter as inserter
+if __name__ == '__main__':
+    import thumbnailInserter as inserter
+else:
+    from hdf_python import thumbnailInserter as inserter
 
 XMP_OUR_MAGIC = "MTDXMP%"
 XMP_SIG_MAGIC = "SIGXMP%"
@@ -30,7 +33,7 @@ id=(\"|')W5M0MpCehiHzreSzNTczkc9d(\"|')\\?>)|\
 (<\\?xpacket end=(\"|')(w|r)(\"|')\\?>)"
 
 
-def file_split(f, delim='>', bufsize=1):
+def file_split(f, delim='>', bufsize=64):
     prev = ''
     first_found = False
     while True:
@@ -59,9 +62,12 @@ def remove_xmp_header(xmp):
 
 
 def try_sidecar(args):
-    base_file_name = os.path.splitext(
-        os.path.abspath(args.inputFile))[0]
-    xmp_file = base_file_name + ".xmp"
+    file_name_data = os.path.splitext(
+        os.path.abspath(args.inputFile))
+    if file_name_data[-1] in '.xmp':
+        xmp_file = args.inputFile
+    else:
+        xmp_file = file_name_data[0] + ".xmp"
 
     # If the file doesn't exist print a warning and exit
     if not os.path.isfile(xmp_file):
@@ -75,6 +81,11 @@ def try_sidecar(args):
 
 
 def extract_xmp(args):
+    # If xmp is given directly don't read it twice
+    if '.xmp' in os.path.splitext(
+            os.path.abspath(args.inputFile))[-1]:
+        return try_sidecar(args)
+
     with open(args.inputFile, 'rb') as inFile:
         # If the HDF5 header is found the file doesn't contain a thumbnail
         # If this happens a sidecar is tried
@@ -96,11 +107,14 @@ def extract_xmp(args):
             if inserter.MAGIC_HDF_STRING in line:
                 return try_sidecar(args)
 
+        return try_sidecar
+
 
 def read_desc(xmp_desc, args):
     if not args.thumbnail:
         # Extract the key/values pairs starting with 'xap:'
-        result = {k: v for k, v in xmp_desc.items()
+        # Remove the 'xap:' in front of it
+        result = {k.replace('xap:', ''): v for k, v in xmp_desc.items()
                   if 'xap:' in k and 'xap:Thumbnails' not in k}
         return result
     else:

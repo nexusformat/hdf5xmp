@@ -11,6 +11,7 @@ import sys
 MAGIC_HDF = 0x89484446
 MAGIC_HDF_STRING = '\x89\x48\x44\x46'
 
+
 def read_in_chunks(file, chunk_size=1024):
     while True:
         data = file.read(chunk_size)
@@ -28,11 +29,14 @@ def next_power2(num):
 
 
 def check_hdf_header(file, location):
+    """Check if at the specified position The header of a hdf5 file is found"""
     file.seek(location)
     sig = file.read(4)
     return int.from_bytes(sig, byteorder="big") == MAGIC_HDF
 
+
 def construct_xmp_file(imageFile, key_value_data):
+    """Construct the xmp file based on the imageFile and key_value_data input"""
     # Remove the quotes and leading b from the string
     base64Image = base64.b64encode(imageFile.read()).decode('utf-8')
     # Get the xmp template
@@ -54,7 +58,7 @@ def construct_xmp_file(imageFile, key_value_data):
             for pair in key_value_data:
                 key_value_string += '<xap:' + pair[0] + '>' + pair[1] \
                     + '</xap:' + pair[0] + '>'
-            
+
             xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', key_value_string)
         else:
             xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', '')
@@ -62,9 +66,8 @@ def construct_xmp_file(imageFile, key_value_data):
         return xmp
 
 
-
 def write_into_userblock(args):
-
+    """Write the xmp into the userblock"""
     with open(args.hdf5File, "rb") as hf:
 
         # Check if the file is a HDF5-File
@@ -82,7 +85,8 @@ def write_into_userblock(args):
         with open(args.outfile, "wb") as of:
             of.write(hf.read(i))
             with open(args.imageFile, "rb") as img:
-                of.write(bytearray(construct_xmp_file(img, args.data), encoding="utf-8"))
+                of.write(bytearray(construct_xmp_file(
+                    img, args.data), encoding="utf-8"))
 
             # Go to the next power of 2
             if not is_power2(of.tell()):
@@ -92,7 +96,9 @@ def write_into_userblock(args):
             for c in read_in_chunks(hf):
                 of.write(c)
 
+
 def write_into_sidecar(args):
+    """Write the xmp into a sidecar file"""
     h5FileName = os.path.splitext(os.path.abspath(args.hdf5File))[0]
     path = h5FileName + ".xmp"
     if args.outfile != None:
@@ -100,7 +106,8 @@ def write_into_sidecar(args):
 
     with open(path, "w") as of:
         with open(args.imageFile, "rb") as img:
-            of.write(construct_xmp_file(img, args.data))
+            of.write(construct_xmp_file(img, args.data)
+                     .replace('MTDXMP%', '').replace('SIGXMP%', ''))
 
 
 def main():
@@ -131,8 +138,6 @@ def main():
     if args.hdf5File == args.imageFile:
         print("Error! Both files can't be the same")
         sys.exit(-1)
-
-    print(args.data)
 
     if not args.sidecar:
         if args.outfile is None:
