@@ -2,13 +2,14 @@
 
 """Insert image as thumbnail into hdf5 file"""
 
-import sys
-import os
 import argparse
-import math
 import base64
+import math
+import os
+import sys
 
 MAGIC_HDF = 0x89484446
+MAGIC_HDF_STRING = '\x89\x48\x44\x46'
 
 def read_in_chunks(file, chunk_size=1024):
     while True:
@@ -33,7 +34,7 @@ def check_hdf_header(file, location):
 
 def construct_xmp_file(imageFile, key_value_data):
     # Remove the quotes and leading b from the string
-    base64Image = str(base64.b64encode(imageFile.read())).strip("b'").strip("'")
+    base64Image = base64.b64encode(imageFile.read()).decode('utf-8')
     # Get the xmp template
     path = os.path.dirname(os.path.abspath(__file__)) + "/template.xmp"
 
@@ -56,7 +57,7 @@ def construct_xmp_file(imageFile, key_value_data):
             
             xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', key_value_string)
         else:
-            xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', '');
+            xmp = xmp.replace('{{CUSTOM_KEY_VALUES}}', '')
 
         return xmp
 
