@@ -4,6 +4,7 @@
     <rdf:Description rdf:about=''
                      xmlns:xap='http://ns.adobe.com/xap/1.0/'
                      xmlns:xapGImg='http://ns.adobe.com/xap/1.0/g/img/'>
+      
       <xap:Thumbnails>
         <rdf:Alt>
           <rdf:li rdf:parseType='Resource'>

@@ -2,6 +2,8 @@
 #define HDF5THUMBNAIL_CORE_H
 
 #include <fstream>
+#include <iterator>
+#include <algorithm>
 #include <iostream>
 #include <regex>
 #ifndef WIN32
@@ -11,10 +13,12 @@
 #include "base64.h"
 
 #define MAGIC_HDF 0x89484446
+#define XMP_SIG_MAGIC "SIGXMP%"
 
 #define HDF_FILE_ENDING ".hdf5"
 
-constexpr int FILE_END_LENGTH = sizeof(HDF_FILE_ENDING) - 1;
+constexpr int HDF_FILE_ENDING_LENGTH = sizeof(HDF_FILE_ENDING) - 1;
+constexpr int XMP_SIG_MAGIC_LENGTH = sizeof(XMP_SIG_MAGIC) - 1;
 
 
 // Regular expression for finding the xmp header and footer
