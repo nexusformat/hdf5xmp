@@ -58,7 +58,7 @@ unsigned long findXMPSignature(std::ifstream &stream,
       // Calculate the signature's position in the file
       // Twice the bufsize is used because the searchbuffer is twice as large as
       // the other ones
-      pos = stream.tellg() - (long)bufsize * 2 + pos;
+      pos = (long)stream.tellg() - (long)bufsize * 2 + pos;
       // Return to the position and return it
       stream.seekg(pos);
       return pos;

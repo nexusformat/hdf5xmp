@@ -42,7 +42,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -76,7 +76,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\HDF_Group\HDF5\1.8.17\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\IEUser\projects\hdf5Thumbnails\common;C:\Program Files\HDF_Group\HDF5\1.8.17\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\HDF_Group\HDF5\1.8.17\bin;C:\Program Files\HDF_Group\HDF5\1.8.17\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

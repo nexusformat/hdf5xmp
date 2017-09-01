@@ -163,7 +163,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:HDF5 Thumbnailer"
         "ProductCode" = "8:{D219EFC5-AA8A-4705-9995-45B2531ED6C2}"
-        "PackageCode" = "8:{17458B39-7C93-4E41-BBBF-6CD860D23D12}"
+        "PackageCode" = "8:{7F1B1179-3065-4B5F-BA39-BE4BA2E0AB84}"
         "UpgradeCode" = "8:{B856AC84-0D13-4A63-9576-F495578B9F6C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -176,7 +176,7 @@
         "ARPHELPLINK" = "8:"
         "Title" = "8:HDF5Setup"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Semafor"
+        "ARPCONTACT" = "8:Semafor AG"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:A Thumbnailer for HDF5 Files"
         "ARPURLINFOABOUT" = "8:semafor.ch"
@@ -808,7 +808,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C4AC9FC88B6E456E81FC69C706E6EF9E"
             {
-            "SourcePath" = "8:..\\x64\\Release\\CppShellExtThumbnailHandler.dll"
+            "SourcePath" = "8:..\\Release\\CppShellExtThumbnailHandler.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_44EFFBFA77364770985150F262BB2CA1"
