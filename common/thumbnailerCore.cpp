@@ -1,5 +1,14 @@
-#include "thumbnailerCore.h"
+#include <fstream>
+#include <iostream>
+#include <regex>
 #include <vector>
+#ifndef WIN32
+#include <netinet/in.h>
+#endif
+#include "base64.h"
+#include "tinyxml2.h"
+
+#include "thumbnailerCore.h"
 
 unsigned long findXMPSignature(std::ifstream &stream,
                                const unsigned long bufsize = 128) {
@@ -38,7 +47,8 @@ unsigned long findXMPSignature(std::ifstream &stream,
   // Read until end of file or return
   while (!stream.eof()) {
 
-    // Read into a buffer every other iteration
+    // Flip the buffer that gets read into and their sequence in the
+    // searchbuffer on every iteration
     if (flip) {
       // Read into buffer2
       stream.read(&buffer2[0], bufsize);
@@ -79,42 +89,40 @@ std::string findImageData(tinyxml2::XMLDocument &xmp) {
   // This is done with the safe assumption that the XMP file has that hirarchy
   tinyxml2::XMLElement *currentElement =
       xmp.RootElement()->FirstChildElement()->FirstChildElement();
-  do {
+  for (; currentElement;
+       currentElement = currentElement->NextSiblingElement()) {
     // Try to find the tag containing the image-data
     if (!currentElement->NoChildren()) {
       // If it has a tag with this name it should take the first element of the
       // list it contains
       if (currentElement->FirstChildElement("xap:Thumbnails")) {
-        tinyxml2::XMLElement *thumbnailsTag =
+        tinyxml2::XMLElement *thumbnailTag =
             currentElement->FirstChildElement("xap:Thumbnails");
 
-        if (!thumbnailsTag->NoChildren()) {
-          tinyxml2::XMLElement *thumbnailList =
-              thumbnailsTag->FirstChildElement();
+        // Go to the next loop iteration if no children
+        if (thumbnailTag->NoChildren())
+          continue;
 
-          if (!thumbnailList->NoChildren()) {
-            tinyxml2::XMLElement *thumbnailTag =
-                thumbnailList->FirstChildElement();
+        thumbnailTag = thumbnailTag->FirstChildElement();
+        if (thumbnailTag->NoChildren())
+          continue;
 
-            if (thumbnailTag->FirstChildElement("xapGImg:image")) {
-              // Decode the base64 image-data
-              const char *base64Data =
-                  thumbnailTag->FirstChildElement("xapGImg:image")->GetText();
-              return base64_decode(base64Data);
-            }
-          }
-        }
+        thumbnailTag = thumbnailTag->FirstChildElement();
+        if (!thumbnailTag->FirstChildElement("xapGImg:image"))
+          continue;
+
+        // If it found the 'xapGImg:image' tag extract the data from it
+        thumbnailTag = thumbnailTag->FirstChildElement("xapGImg:image");
+        return base64_decode(thumbnailTag->GetText());
       }
     }
-    // Go to the next element
-    currentElement = currentElement->NextSiblingElement();
-  } while (currentElement);
+  }
   return "";
 }
 
 // Get the thumbnail out of an XMP block at the current stream position
 // with a size of 'size'
-std::string readXMPBySize(std::ifstream &stream, long size) {
+std::string readImageFromXMPBySize(std::ifstream &stream, long size) {
   std::vector<char> buffer(size + 1);
   stream.read(buffer.data(), size);
   stream.close();
@@ -149,7 +157,7 @@ std::string readXmpFromSidecar(std::string path) {
   std::streamsize size = xmpFile.tellg();
   xmpFile.seekg(0);
 
-  return readXMPBySize(xmpFile, size);
+  return readImageFromXMPBySize(xmpFile, size);
 }
 
 std::string readFromHdfFile(std::string path) {
@@ -195,7 +203,7 @@ std::string readFromHdfFile(std::string path) {
 
   long size = end - start;
 
-  return readXMPBySize(file, size);
+  return readImageFromXMPBySize(file, size);
 }
 
 std::string getThumbnail(std::string path) {

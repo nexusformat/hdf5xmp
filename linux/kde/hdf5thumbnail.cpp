@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "hdf5thumbnail.h"
 
 // Configuration for KDE plugin creation

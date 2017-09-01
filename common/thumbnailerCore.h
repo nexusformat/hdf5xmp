@@ -1,16 +1,7 @@
 #ifndef HDF5THUMBNAIL_CORE_H
 #define HDF5THUMBNAIL_CORE_H
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <iterator>
-#include <regex>
-#ifndef WIN32
-#include <netinet/in.h>
-#endif
-#include "base64.h"
-#include "tinyxml2.h"
+#include <string>
 
 #define MAGIC_HDF 0x89484446
 #define XMP_SIG_MAGIC "SIGXMP%"
