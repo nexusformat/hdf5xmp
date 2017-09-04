@@ -15,9 +15,9 @@ import sys
 
 import xmltodict
 
-if __name__ == '__main__':
+try:
     import thumbnailInserter as inserter
-else:
+except ImportError:
     from hdf_python import thumbnailInserter as inserter
 
 XMP_OUR_MAGIC = "MTDXMP%"
@@ -37,24 +37,27 @@ def file_split(f, delim='>', bufsize=64):
     prev = ''
     first_found = False
     while True:
-        s = f.read(bufsize).decode('utf-8')
-        if not s:
+        s = f.read(bufsize).decode('utf-8', 'replace')
+
+        if not s or f.tell() == os.fstat(f.fileno()).st_size:
             break
 
         split = s.split(delim)
 
         if len(split) > 1:
             first_found = True
-            yield prev + split[0]
+            yield prev + split[0], f.tell() + len(split[0]) - bufsize
             prev = split[-1]
             for x in split[1:-1]:
-                yield x
+                yield x, f.tell() + len(split[0]) - bufsize
         else:
-            if not first_found:
-                f.seek(f.tell() - bufsize // 2)
             prev += s
+            # Move half the buffer forward to prevent the problem of having half the signature cut off
+            if first_found:
+                prev = prev[0:-(bufsize // 2)]
+            f.seek(f.tell() - bufsize // 2)
     if prev:
-        yield prev
+        yield prev, 0
 
 
 def remove_xmp_header(xmp):
@@ -96,7 +99,7 @@ def extract_xmp(args):
 
         # Find the beginning of the XMP Data
         xmp_start = False
-        for line in file_split(inFile, XMP_SIG_MAGIC, bufsize=512):
+        for line, p in file_split(inFile, XMP_SIG_MAGIC, bufsize=1024):
             if XMP_OUR_MAGIC in line and not xmp_start:
                 # Declare the start of the XMP Data as the end of this line
                 xmp_start = True
@@ -107,7 +110,7 @@ def extract_xmp(args):
             if inserter.MAGIC_HDF_STRING in line:
                 return try_sidecar(args)
 
-        return try_sidecar
+        return try_sidecar(args)
 
 
 def read_desc(xmp_desc, args):
@@ -153,8 +156,9 @@ def main(args):
     xml_data = extract_xmp(args)
     if args.thumbnail:
         with open(args.outputFile, 'wb') as of:
-            data = bytes(read_data(xml_data, args), 'utf-8')
-            of.write(base64.decodebytes(data))
+            b64string = read_data(xml_data, args)
+            print(b64string)
+            of.write(base64.b64decode(b64string))
     else:
         json.dump(read_data(xml_data, args), sys.stdout)
 

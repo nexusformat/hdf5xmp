@@ -12,12 +12,12 @@ from contextlib import redirect_stdout
 
 import pytest
 
-sys.path.insert(0, '..')
-
-from hdf_python import thumbnailInserter as ins
-from hdf_python import metadataReader as reader
-
 srcdir = os.path.dirname(__file__)
+sys.path.insert(0, srcdir + '/..')
+
+import thumbnailInserter as ins
+import metadataReader as reader
+
 
 
 def test_sidecar_data():
