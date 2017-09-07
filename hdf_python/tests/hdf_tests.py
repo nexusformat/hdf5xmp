@@ -8,6 +8,7 @@ import sys
 import argparse
 import filecmp
 import io
+import time
 from contextlib import redirect_stdout
 
 import pytest
@@ -24,11 +25,11 @@ def test_sidecar_data():
     ins_args.hdf5File = srcdir + '/nothumb.hdf5'
     ins_args.imageFile = srcdir + '/testImage.png'
     ins_args.data = [['testField', 'testValue']]
-    ins_args.outfile = srcdir + '/testoutput.xmp'
+    ins_args.outfile = srcdir + '/testoutput.' + str(time.time()) + '.xmp'
     ins.write_into_sidecar(ins_args)
 
     ext_args = argparse.ArgumentParser()
-    ext_args.inputFile = srcdir + '/testoutput.xmp'
+    ext_args.inputFile = ins_args.outfile
     ext_args.thumbnail = True
     ext_args.outputFile = srcdir + '/testoutput.png'
 
@@ -79,11 +80,11 @@ def test_sidecar_update():
     ins_args.hdf5File = srcdir + '/thumbXMP.hdf5'
     ins_args.imageFile = srcdir + '/testImage2.png'
     ins_args.data = [['Test', 'None'], ['Test3', 'Data3']]
-    ins_args.outfile = srcdir + '/testoutput.upd.xmp'
+    ins_args.outfile = srcdir + '/testoutput.upd.' + str(time.time()) + '.xmp'
     ins.update_sidecar(ins_args)
 
     ext_args = argparse.ArgumentParser()
-    ext_args.inputFile = srcdir + '/testoutput.upd.xmp'
+    ext_args.inputFile = ins_args.outfile
     ext_args.thumbnail = True
     ext_args.outputFile = srcdir + '/testoutput.upd.png'
 
@@ -111,7 +112,7 @@ def test_userblock_update():
     ins_args.imageFile = srcdir + '/testImage2.png'
     ins_args.data = [['Test', 'None'], ['Test3', 'Data3']]
     ins_args.outfile = srcdir + '/testoutput.upd.hdf5'
-    ins.update_hdf(ins_args)
+    ins.write_into_userblock(ins_args)
 
     ext_args = argparse.ArgumentParser()
     ext_args.inputFile = srcdir + '/testoutput.upd.hdf5'
