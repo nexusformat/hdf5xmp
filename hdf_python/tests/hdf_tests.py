@@ -75,6 +75,7 @@ def test_userblock_data():
 
     assert json.loads(f.getvalue())['testField'] == 'testValue'
 
+
 def test_sidecar_update():
     ins_args = argparse.ArgumentParser()
     ins_args.hdf5File = srcdir + '/thumbXMP.hdf5'
@@ -105,6 +106,7 @@ def test_sidecar_update():
     assert kv_pairs['Test2'] == 'Data2'
     assert kv_pairs['Test3'] == 'Data3'
     assert 'Test' not in kv_pairs
+
 
 def test_userblock_update():
     ins_args = argparse.ArgumentParser()
