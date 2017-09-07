@@ -209,7 +209,14 @@ def update_hdf(args):
 
             # Write everything between the xmp end and signature start to the new file
             hf.seek(xmp_end_byte)
-            of.write(hf.read(hdfpos - xmp_end_byte))
+            after_xmp = hf.read(hdfpos - xmp_end_byte)
+            i = 0
+            while i < len(after_xmp) and after_xmp[::-1][i] == 0:
+                i += 1
+            hf.seek(xmp_end_byte)
+            # Don't write the padding except for 4 bytes in case they are relevant to other stored information
+            of.write(hf.read(len(after_xmp) - i + 4))
+            hf.seek(hdfpos)
 
             of.seek(next_power2(of.tell()))
             for chunk in read_in_chunks(hf):
