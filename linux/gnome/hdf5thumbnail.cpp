@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   std::string binaryData = getThumbnail(path);
 
   if (binaryData.length() == 0) {
-    std::cout << "No thumbnails Found";
+    std::cout << "No thumbnails Found in " << path;
     return -2;
   }
 
