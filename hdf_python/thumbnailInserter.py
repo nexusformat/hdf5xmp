@@ -3,6 +3,7 @@
 """Insert image as thumbnail into hdf5 file"""
 
 import argparse
+import struct
 import base64
 import math
 import os
@@ -14,8 +15,8 @@ try:
 except ImportError:
     from .hdf_python import metadataReader as reader
 
-MAGIC_HDF = 0x89484446
-MAGIC_HDF_STRING = '\x89\x48\x44\x46'
+MAGIC_HDF = 0x894844460d0a1a0a
+XMP_OUR_MAGIC = 0x89484D500d0a1a0a
 
 XMP_HEADER = '<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>\n'
 XMP_FOOTER = '\n<?xpacket end="w"?>'
@@ -37,11 +38,37 @@ def next_power2(num):
     return 2**(math.ceil(math.log(num, 2)))
 
 
-def check_hdf_header(file, location):
+def check_image_files(args):
+    #  Checks if the imageFile exists
+    if args.imageFile is None or not os.path.isfile(args.imageFile):
+        if args.imageFile is None:
+            print("Error imageFile argument missing")
+        else:
+            print("Error " + args.imageFile + " is not a file")
+            sys.exit(-1)
+
+
+def check_header(file, location, header):
     """Check if at the specified position The header of a hdf5 file is found"""
     file.seek(location)
-    sig = file.read(4)
-    return int.from_bytes(sig, byteorder="big") == MAGIC_HDF
+    sig = file.read(8)
+    return int.from_bytes(sig, byteorder="big") == header
+
+
+def exists_header(file, location):
+    """Check if at the specified position is a valid header"""
+    file.seek(location)
+    sig = file.read(8)
+    # Compare but ignore the two changeable byts
+    return int.from_bytes(sig, byteorder="big") & 0xffff0000ffffffff == MAGIC_HDF & 0xffff0000ffffffff
+
+
+def read_datablock_size(file, location):
+    """Return the size of the datablock starting at location"""
+    # Advance 8 bytes to skip signature
+    file.seek(location + 8)
+    # Return the 8 byte long size
+    return int.from_bytes(file.read(8), byteorder="big")
 
 
 def construct_xmp_file(imageFile, key_value_data):
@@ -81,27 +108,79 @@ def write_into_userblock(args):
 
         # Check if the file is a HDF5-File
         fileSize = os.fstat(hf.fileno()).st_size
-        i = 0
-        while not check_hdf_header(hf, i) and i < fileSize:
-            i = next_power2(i + 1)
+        hdf_pos = 0
+        while not check_header(hf, hdf_pos, MAGIC_HDF) and hdf_pos < fileSize:
+            hdf_pos = next_power2(hdf_pos + 1)
 
-        if not check_hdf_header(hf, i):
+        if not check_header(hf, hdf_pos, MAGIC_HDF):
             print("Not a HDF5 File")
             exit(-1)
 
+        xmp_search_pos = 0
         hf.seek(0)
 
-        with open(args.outfile, "wb") as of:
-            of.write(hf.read(i))
+        more = True
+        # Find out if there is already a xmp block present
+        while not check_header(hf, xmp_search_pos, XMP_OUR_MAGIC) and \
+                not check_header(hf, xmp_search_pos, MAGIC_HDF) and \
+                xmp_search_pos < fileSize:
+            data_size = read_datablock_size(hf, xmp_search_pos)
+            # If the data size is 0 then padding is found
+            if not exists_header(hf, xmp_search_pos):
+                more = False
+                break
+            # Advance to the next datablock
+            hf.seek(hf.tell() + data_size + 8)
+            xmp_search_pos = hf.tell()
+
+        xmp = ''
+
+        # If an XMP is already there just update it
+        if check_header(hf, xmp_search_pos, XMP_OUR_MAGIC):
+            xmp_size = read_datablock_size(hf, xmp_search_pos)
+            xmp = get_updated_xmp(xmltodict.parse(
+                hf.read(xmp_size)), args).encode('utf-8')
+        # If there isn't already an xmp create a new one. A image parameter is required for this
+        else:
+            check_image_files(args)
             with open(args.imageFile, "rb") as img:
-                of.write(bytearray(construct_xmp_file(
-                    img, args.data), encoding="utf-8"))
+                xmp = bytearray(construct_xmp_file(
+                    img, args.data), encoding="utf-8")
+
+        with open(args.outfile, "wb") as of:
+            hf.seek(0)
+            # Write everything before the xmp block from the userblock
+            # If there isn't a xmp block write the entire userblock instead
+            of.write(hf.read(xmp_search_pos))
+
+            # Add the headers to the xmp
+            of.write(struct.pack('!Q', XMP_OUR_MAGIC))
+            of.write(struct.pack('!Q', len(xmp)))
+            of.write(xmp)
+
+            # If there is more data in the userblock after the xmp
+            if more:
+                search_pos = xmp_search_pos
+                # As long as it still finds a datablock header
+                while not exists_header(hf, search_pos) and not check_header(hf, search_pos, MAGIC_HDF) and search_pos < fileSize:
+                    data_size = read_datablock_size(hf, search_pos)
+
+                    # If we find another xmp block remove it. There should be only one block of xmp
+                    if check_header(hf, search_pos, XMP_OUR_MAGIC):
+                        # 8 Bytes = We are in the middle of the 16 byte long header
+                        hf.seek(hf.tell() + data_size + 8)
+                    else:
+                        hf.seek(search_pos)
+                        # We are at the start of the header so we advance 16 bytes
+                        of.write(hf.read(data_size + 16))
+                    search_pos = hf.tell()
 
             # Go to the next power of 2
             if not is_power2(of.tell()):
                 of.seek(next_power2(of.tell()))
 
             # Write the HDF5 File
+            hf.seek(hdf_pos)
             for c in read_in_chunks(hf):
                 of.write(c)
 
@@ -113,15 +192,19 @@ def write_into_sidecar(args):
     if args.outfile != None:
         path = args.outfile
 
+    if os.path.isfile(path):
+        return update_sidecar(args)
+
+    check_image_files(args)
     with open(path, "w") as of:
         with open(args.imageFile, "rb") as img:
-            of.write(construct_xmp_file(img, args.data)
-                     .replace(reader.XMP_OUR_MAGIC, '').replace(reader.XMP_SIG_MAGIC, ''))
+            of.write(construct_xmp_file(img, args.data))
 
 
 def get_updated_xmp(data, args):
     # If a imageFile is given replace the current thumbnail
     if args.imageFile is not None:
+        check_image_files(args)
         with open(args.imageFile, 'rb') as img:
             base64image = base64.b64encode(img.read()).decode('utf-8')
             data['x:xmpmeta']['rdf:RDF']['rdf:Description']['xap:Thumbnails']['rdf:Alt']['rdf:li']['xapGImg:image'] = base64image
@@ -154,73 +237,8 @@ def update_sidecar(args):
 
 
 def update_hdf(args):
-    xmp = ''
-    xmp_start_byte = 0
-    xmp_end_byte = 0
-    with open(args.hdf5File, 'rb') as hf:
-        xmp_start = False
-        for line, pos in reader.file_split(hf, reader.XMP_SIG_MAGIC, bufsize=1024):
-            if reader.XMP_OUR_MAGIC in line and not xmp_start:
-                # Declare the start of the XMP Data as the end of this line
-                xmp_start = True
-                xmp_start_byte = pos
-
-            if reader.XMP_FOOTER_MAGIC in line and xmp_start:
-                xmp = line
-                xmp_end_byte = xmp_start_byte + \
-                    len(xmp) + len(reader.XMP_SIG_MAGIC)
-                break
-
-            if MAGIC_HDF_STRING in line:
-                print("Error! No xmp found in userblock!")
-                exit(-1)
-
-        if len(xmp) == 0:
-            print("Error! No xmp found in file")
-            exit(-1)
-
-        # Update the xmp
-        xmp = get_updated_xmp(xmltodict.parse(xmp), args)
-
-        # Add the signature lenght to the start
-        xmp_start_byte += len(reader.XMP_SIG_MAGIC)
-        hf.seek(0)
-        with open(args.outfile, 'wb') as of:
-            # Write everything before the xmp and the xmp to the userblock
-            of.write(hf.read(xmp_start_byte))
-            of.write(xmp.encode('utf-8'))
-            hf.seek(0)
-
-            # Determine the start of the hdf5 data in the inputfile
-            fileSize = os.fstat(hf.fileno()).st_size
-            hdfpos = 0
-            while not check_hdf_header(hf, hdfpos) and hdfpos < fileSize:
-                hdfpos = next_power2(hdfpos + 1)
-
-            # If it doesn't find a hdf5 signature at the right place
-            # It will just append the rest of the file
-            if not check_hdf_header(hf, hdfpos):
-                hf.seek(xmp_end_byte)
-                print(
-                    "No hdf5 signature found! Appending rest of file to updated version")
-                for chunk in read_in_chunks(hf):
-                    of.write(chunk)
-                return
-
-            # Write everything between the xmp end and signature start to the new file
-            hf.seek(xmp_end_byte)
-            after_xmp = hf.read(hdfpos - xmp_end_byte)
-            i = 0
-            while i < len(after_xmp) and after_xmp[::-1][i] == 0:
-                i += 1
-            hf.seek(xmp_end_byte)
-            # Don't write the padding except for 4 bytes in case they are relevant to other stored information
-            of.write(hf.read(len(after_xmp) - i + 4))
-            hf.seek(hdfpos)
-
-            of.seek(next_power2(of.tell()))
-            for chunk in read_in_chunks(hf):
-                of.write(chunk)
+    print('Deprecated')
+    exit(-1)
 
 
 def main():
@@ -236,8 +254,6 @@ def main():
                         help='custom user-defined Key-Value pairs')
 
     parser.add_argument('--sidecar', action='store_true')
-    parser.add_argument('--update', action='store_true',
-                        help='update the xmp metadata')
     args = parser.parse_args()
     args.imageFile = args.img
 
@@ -257,39 +273,18 @@ def main():
         print("Error " + args.hdf5File + " is not a file")
         sys.exit(-1)
 
-    #  Checks if the imageFile exists
-    if not args.update:
-        if args.imageFile is None or not os.path.isfile(args.imageFile):
-            if args.imageFile is None:
-                print("Error imageFile argument missing")
-            else:
-                print("Error " + args.imageFile + " is not a file")
-            sys.exit(-1)
+    #  Makes sure that both files aren't the same
+    if args.hdf5File == args.imageFile:
+        print("Error! HDF5-File can't be the imageFile at the same time")
+        sys.exit(-1)
 
-        #  Makes sure that both files aren't the same
-        if args.hdf5File == args.imageFile:
-            print("Error! HDF5-File can't be the imageFile at the same time")
+    if not args.sidecar:
+        if args.outfile is None:
+            print("Error! Outfile argument required when using without --sidecar")
             sys.exit(-1)
-
-        if not args.sidecar:
-            if args.outfile is None:
-                print("Error! Outfile argument required when using without --sidecar")
-                sys.exit(-1)
-            write_into_userblock(args)
-        else:
-            write_into_sidecar(args)
+        write_into_userblock(args)
     else:
-        if args.imageFile is not None and not os.path.isfile(args.imageFile):
-            print("Error " + args.imageFile + " is not a file")
-            exit(-1)
-
-        if not args.sidecar:
-            if args.outfile is None:
-                print("Error! Outfile argument required when using without --sidecar")
-                sys.exit(-1)
-            update_hdf(args)
-        else:
-            update_sidecar(args)
+        write_into_sidecar(args)
 
 
 if __name__ == "__main__":
