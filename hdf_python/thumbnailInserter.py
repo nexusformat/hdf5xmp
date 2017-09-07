@@ -3,17 +3,13 @@
 """Insert image as thumbnail into hdf5 file"""
 
 import argparse
-import struct
 import base64
 import math
 import os
+import struct
 import sys
-import xmltodict
 
-try:
-    import metadataReader as reader
-except ImportError:
-    from .hdf_python import metadataReader as reader
+import xmltodict
 
 MAGIC_HDF = 0x894844460d0a1a0a
 XMP_OUR_MAGIC = 0x89484D500d0a1a0a
@@ -43,6 +39,7 @@ def check_image_files(args):
     if args.imageFile is None or not os.path.isfile(args.imageFile):
         if args.imageFile is None:
             print("Error imageFile argument missing")
+            exit(-1)
         else:
             print("Error " + args.imageFile + " is not a file")
             sys.exit(-1)
@@ -234,11 +231,6 @@ def update_sidecar(args):
             xf.seek(0)
             xf.write(get_updated_xmp(data, args))
             xf.truncate()
-
-
-def update_hdf(args):
-    print('Deprecated')
-    exit(-1)
 
 
 def main():

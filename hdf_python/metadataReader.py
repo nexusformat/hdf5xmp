@@ -10,7 +10,6 @@ import argparse
 import base64
 import json
 import os
-import re
 import sys
 
 import xmltodict
@@ -19,49 +18,6 @@ try:
     import thumbnailInserter as inserter
 except ImportError:
     from hdf_python import thumbnailInserter as inserter
-
-XMP_OUR_MAGIC = "MTDXMP%"
-XMP_SIG_MAGIC = "SIGXMP%"
-XMP_FOOTER_MAGIC = "<?xpacket"
-
-# The magic number of XMP files
-MAGIC_NUMBER_XMP = "W5M0MpCehiHzreSzNTczkc9d"
-
-# Regex used to remove the HDF5 Header and footer
-MAGIC_XMP_HEADER_REGEX = "(<\\?xpacket begin=(\"|')(.?.?.?)(\"|') \
-id=(\"|')W5M0MpCehiHzreSzNTczkc9d(\"|')\\?>)|\
-(<\\?xpacket end=(\"|')(w|r)(\"|')\\?>)"
-
-
-def file_split(f, delim='>', bufsize=64):
-    prev = ''
-    first_found = False
-    while True:
-        s = f.read(bufsize).decode('utf-8', 'replace')
-
-        if not s or f.tell() == os.fstat(f.fileno()).st_size:
-            break
-
-        split = s.split(delim)
-
-        if len(split) > 1:
-            first_found = True
-            yield prev + split[0], f.tell() + len(split[0]) - bufsize
-            prev = split[-1]
-            for x in split[1:-1]:
-                yield x, f.tell() + len(split[0]) - bufsize
-        else:
-            prev += s
-            # Move half the buffer forward to prevent the problem of having half the signature cut off
-            if first_found:
-                prev = prev[0:-(bufsize // 2)]
-            f.seek(f.tell() - bufsize // 2)
-    if prev:
-        yield prev, 0
-
-
-def remove_xmp_header(xmp):
-    return re.sub(MAGIC_XMP_HEADER_REGEX, '', xmp)
 
 
 def try_sidecar(args):
@@ -79,8 +35,7 @@ def try_sidecar(args):
 
     with open(xmp_file, 'r') as xf:
         # Remove the xmp headers and our signatures
-        return remove_xmp_header(xf.read())\
-            .replace(XMP_OUR_MAGIC, '').replace(XMP_SIG_MAGIC, '')
+        return xf.read()
 
 
 def extract_xmp(args):
@@ -89,28 +44,37 @@ def extract_xmp(args):
             os.path.abspath(args.inputFile))[-1]:
         return try_sidecar(args)
 
-    with open(args.inputFile, 'rb') as inFile:
-        # If the HDF5 header is found the file doesn't contain a thumbnail
-        # If this happens a sidecar is tried
-        if inserter.check_hdf_header(inFile, 0):
+    with open(args.inputFile, 'rb') as hf:
+
+        # Check if the file is a HDF5-File
+        fileSize = os.fstat(hf.fileno()).st_size
+        hdf_pos = 0
+        while not inserter.check_header(hf, hdf_pos, inserter.MAGIC_HDF) and hdf_pos < fileSize:
+            hdf_pos = inserter.next_power2(hdf_pos + 1)
+
+        if not inserter.check_header(hf, hdf_pos, inserter.MAGIC_HDF):
             return try_sidecar(args)
 
-        inFile.seek(0)
+        xmp_search_pos = 0
+        hf.seek(0)
 
-        # Find the beginning of the XMP Data
-        xmp_start = False
-        for line, p in file_split(inFile, XMP_SIG_MAGIC, bufsize=1024):
-            if XMP_OUR_MAGIC in line and not xmp_start:
-                # Declare the start of the XMP Data as the end of this line
-                xmp_start = True
+        while not inserter.check_header(hf, xmp_search_pos, inserter.XMP_OUR_MAGIC) and \
+                not inserter.check_header(hf, xmp_search_pos, inserter.MAGIC_HDF) and \
+                xmp_search_pos < fileSize:
+            data_size = inserter.read_datablock_size(hf, xmp_search_pos)
+            # If the data size is 0 then padding is found
+            if not inserter.exists_header(hf, xmp_search_pos):
+                break
+            # Advance to the next datablock
+            hf.seek(hf.tell() + data_size + 8)
+            xmp_search_pos = hf.tell()
 
-            if XMP_FOOTER_MAGIC in line and xmp_start:
-                return remove_xmp_header(line)
+        # If an XMP is already there just update it
+        if inserter.check_header(hf, xmp_search_pos, inserter.XMP_OUR_MAGIC):
+            xmp_size = inserter.read_datablock_size(hf, xmp_search_pos)
+            return hf.read(xmp_size)
 
-            if inserter.MAGIC_HDF_STRING in line:
-                return try_sidecar(args)
-
-        return try_sidecar(args)
+    return try_sidecar(args)
 
 
 def read_desc(xmp_desc, args):
@@ -157,7 +121,6 @@ def main(args):
     if args.thumbnail:
         with open(args.outputFile, 'wb') as of:
             b64string = read_data(xml_data, args)
-            print(b64string)
             of.write(base64.b64decode(b64string))
     else:
         json.dump(read_data(xml_data, args), sys.stdout)
