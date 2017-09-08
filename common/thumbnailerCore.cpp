@@ -4,6 +4,8 @@
 #include <vector>
 #ifndef WIN32
 #include <endian.h>
+#else
+#include <winsock.h>
 #endif
 #include "base64.h"
 #include "tinyxml2.h"
@@ -13,7 +15,8 @@
 #ifndef WIN32
 #define get_correct_byteorder(x) be64toh(x)
 #else
-#define get_correct_byteorder(x) _byteswap_ulong(x)
+// If the system is big endian just return the value else swap it
+#define get_correct_byteorder(x) htonl(47) == 47 ? x : _byteswap_uint64(x)
 #endif
 
 bool check_header(std::ifstream &stream, uint64_t position, uint64_t header) {
