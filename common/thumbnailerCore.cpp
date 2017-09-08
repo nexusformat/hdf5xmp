@@ -3,79 +3,42 @@
 #include <regex>
 #include <vector>
 #ifndef WIN32
-#include <netinet/in.h>
+#include <endian.h>
 #endif
 #include "base64.h"
 #include "tinyxml2.h"
 
 #include "thumbnailerCore.h"
 
-unsigned long findXMPSignature(std::ifstream &stream,
-                               const unsigned long bufsize = 128) {
+#ifndef WIN32
+#define get_correct_byteorder(x) be64toh(x)
+#else
+#define get_correct_byteorder(x) _byteswap_ulong(x)
+#endif
 
-  // Allocate 3 buffers
-  // There are 3 buffers used to prevent the rare edge case of the signature
-  // being
-  // only halfway in the buffer because it is placed at for example '0x126'
-  // causing it
-  // to be not completely inside
-  // The first two buffers get read to and the searchbuffer is the one witht the
-  // two combined
-  //
-  // Example:
-  //    Searching the signature 'World'
-  //    The signature gets read halfway into the end of buffer2
-  //    This here is a representation of the searchbuffer
-  //
-  //  ['Hello Wo']
-  //        ^ Beginning of buffer2
-  // 'World' can't be recognized because only 'Wo' are inside the buffer
-  //
-  //  ['o World!']
-  //        ^ Beginning of buffer1
-  // After the second read the whole word 'World' is in the buffer and can be
-  // recognized
-  // It is done with 3 buffers instead of one to make the code less complex
-  //
-  // IMPORTANT: If the buffersize is smaller than the length of the signature it
-  // can still fail
-  std::string buffer1(bufsize, '\0');
-  std::string buffer2(bufsize, '\0');
-  std::string searchbuffer((bufsize + 1) * 2, '\0');
+bool check_header(std::ifstream &stream, uint64_t position, uint64_t header) {
+  uint64_t buffer;
+  stream.seekg(position);
+  stream.read(reinterpret_cast<char *>(&buffer), sizeof(buffer));
+  buffer = get_correct_byteorder(buffer);
+  return buffer == header;
+}
 
-  bool flip = true;
-  // Read until end of file or return
-  while (!stream.eof()) {
+uint64_t read_size(std::ifstream &stream, uint64_t position) {
+  uint64_t buffer;
+  // Advance 8 bytes to skip the header
+  stream.seekg(position + sizeof(XMP_OUR_MAGIC));
+  stream.read(reinterpret_cast<char *>(&buffer), sizeof(buffer));
+  return get_correct_byteorder(buffer);
+}
 
-    // Flip the buffer that gets read into and their sequence in the
-    // searchbuffer on every iteration
-    if (flip) {
-      // Read into buffer2
-      stream.read(&buffer2[0], bufsize);
-      // Set the searchbuffer to [b1, b2]
-      searchbuffer = buffer1 + buffer2;
-    } else {
-      // Read into buffer 1
-      stream.read(&buffer1[0], bufsize);
-      // Set the searchbuffer to [b2, b1]
-      searchbuffer = buffer2 + buffer1;
-    }
-    flip = !flip;
-
-    // Check if the signature is somewhere in the searchbuffer
-    long pos = (long)searchbuffer.find(XMP_SIG_MAGIC);
-    if (pos != (long)std::string::npos) {
-      // Calculate the signature's position in the file
-      // Twice the bufsize is used because the searchbuffer is twice as large as
-      // the other ones
-      pos = (long)stream.tellg() - (long)bufsize * 2 + pos;
-      // Return to the position and return it
-      stream.seekg(pos);
-      return pos;
-    }
-  }
-  // Return -1 if it isn't found
-  return -1;
+bool header_exists(std::ifstream &stream, uint64_t position) {
+  uint64_t buffer;
+  stream.seekg(position);
+  stream.read(reinterpret_cast<char *>(&buffer), sizeof(buffer));
+  buffer = get_correct_byteorder(buffer);
+  uint64_t mask = 0xffff0000ffffffff;
+  return (buffer & mask) == (MAGIC_HDF & mask);
 }
 
 std::string removeXMPHeaders(const char *data) {
@@ -166,44 +129,33 @@ std::string readFromHdfFile(std::string path) {
   file.seekg(0, std::ios::beg);
 
   // Check if the file has xmp data
-  uint32_t header;
-  file.read(reinterpret_cast<char *>(&header), 4);
-#ifndef WIN32
-  header = ntohl(header);
-#else
-  header = _byteswap_ulong(header);
-#endif
+  uint64_t header;
+  file.read(reinterpret_cast<char *>(&header), sizeof(header));
+
+  header = get_correct_byteorder(header);
 
   if (header == MAGIC_HDF) {
     file.close();
     return "";
   }
 
-  file.seekg(0, std::ios::beg);
-
-  // Find the start signature
-  unsigned long start = findXMPSignature(file);
-
-  // Start can't be 0 because the other signature also needs to be there
-  if (start == (unsigned long)-1 || start == (unsigned long)0) {
-    return "";
+  uint64_t searchpos = 0;
+  while (header_exists(file, searchpos) &&
+         !check_header(file, searchpos, XMP_OUR_MAGIC)) {
+    // 16 more because of the header
+    searchpos += read_size(file, searchpos) + HEAD_SIZE;
   }
 
-  // Move past the signature
-  start += XMP_SIG_MAGIC_LENGTH;
-  file.seekg(start);
+  // If at the position we stopped we find our header, read the data and return
+  // it
+  if (check_header(file, searchpos, XMP_OUR_MAGIC)) {
+    uint64_t size = read_size(file, searchpos);
+    file.seekg(searchpos + HEAD_SIZE);
 
-  unsigned long end = findXMPSignature(file);
-
-  if (start == (unsigned long)-1) {
+    return readImageFromXMPBySize(file, size);
+  } else {
     return "";
   }
-
-  file.seekg(start);
-
-  long size = end - start;
-
-  return readImageFromXMPBySize(file, size);
 }
 
 std::string getThumbnail(std::string path) {

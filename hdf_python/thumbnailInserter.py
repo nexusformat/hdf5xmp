@@ -37,12 +37,8 @@ def next_power2(num):
 def check_image_files(args):
     #  Checks if the imageFile exists
     if args.imageFile is None or not os.path.isfile(args.imageFile):
-        if args.imageFile is None:
-            print("Error imageFile argument missing")
-            exit(-1)
-        else:
-            print("Error " + args.imageFile + " is not a file")
-            sys.exit(-1)
+        print("Error: imageFile argument missing or {} is not a file".format(args.imageFile))
+        sys.exit(-1)
 
 
 def check_header(file, location, header):
@@ -111,7 +107,7 @@ def write_into_userblock(args):
 
         if not check_header(hf, hdf_pos, MAGIC_HDF):
             print("Not a HDF5 File")
-            exit(-1)
+            sys.exit(-1)
 
         xmp_search_pos = 0
         hf.seek(0)
@@ -234,7 +230,7 @@ def update_sidecar(args):
 
 
 def main():
-
+    """ Read user arguments """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('hdf5File',
                         help='filename to insert the image into')
@@ -251,14 +247,9 @@ def main():
 
     # Ensure that no user defined key value pairs have the same key
     if args.data is not None:
-        for k in args.data:
-            matches = 0
-            for v in args.data:
-                if k[0] == v[0]:
-                    matches += 1
-            if matches > 1:
-                print("Error metadata names must be unique")
-                exit(-1)
+        if len(set([x[0] for x in args.data])) != len(args.data):
+            print("Error metadata names must be unique")
+            sys.exit(-1)
 
     #  Checks if the hdf5File exists
     if not os.path.isfile(args.hdf5File):
