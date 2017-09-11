@@ -11,7 +11,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
 
-add_definitions("-fPIC -O3")
+add_definitions("-fPIC -O3 -std=c++11")
 
 add_library(base64 STATIC ../common/base64.cpp)
 add_library(tinyXML2 STATIC ../common/tinyxml2.cpp)
@@ -52,3 +52,5 @@ if(gnome)
   install(FILES gnome/hdf5.thumbnailer DESTINATION /usr/share/thumbnailers/)
   
 endif()
+
+add_subdirectory(tests)

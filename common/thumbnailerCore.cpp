@@ -1,25 +1,13 @@
-#include <fstream>
 #include <iostream>
+#include <fstream>
 #include <regex>
 #include <vector>
-#ifndef WIN32
-#include <endian.h>
-#else
-#include <winsock.h>
-#endif
 #include "base64.h"
 #include "tinyxml2.h"
 
 #include "thumbnailerCore.h"
 
-#ifndef WIN32
-#define get_correct_byteorder(x) be64toh(x)
-#else
-// If the system is big endian just return the value else swap it
-#define get_correct_byteorder(x) htonl(47) == 47 ? x : _byteswap_uint64(x)
-#endif
-
-bool check_header(std::ifstream &stream, uint64_t position, uint64_t header) {
+bool check_header(std::istream &stream, uint64_t position, uint64_t header) {
   uint64_t buffer;
   stream.seekg(position);
   stream.read(reinterpret_cast<char *>(&buffer), sizeof(buffer));
@@ -27,7 +15,7 @@ bool check_header(std::ifstream &stream, uint64_t position, uint64_t header) {
   return buffer == header;
 }
 
-uint64_t read_size(std::ifstream &stream, uint64_t position) {
+uint64_t read_size(std::istream &stream, uint64_t position) {
   uint64_t buffer;
   // Advance 8 bytes to skip the header
   stream.seekg(position + sizeof(XMP_OUR_MAGIC));
@@ -35,7 +23,7 @@ uint64_t read_size(std::ifstream &stream, uint64_t position) {
   return get_correct_byteorder(buffer);
 }
 
-bool header_exists(std::ifstream &stream, uint64_t position) {
+bool header_exists(std::istream &stream, uint64_t position) {
   uint64_t buffer;
   stream.seekg(position);
   stream.read(reinterpret_cast<char *>(&buffer), sizeof(buffer));
@@ -157,6 +145,7 @@ std::string readFromHdfFile(std::string path) {
 
     return readImageFromXMPBySize(file, size);
   } else {
+    file.close();
     return "";
   }
 }
