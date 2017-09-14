@@ -1,0 +1,39 @@
+\subsection{Linux}
+
+The Linux versions use CMake for their build system.
+
+To compile the thumbnailer, a build folder needs to be created.
+Open a terminal in the build folder and execute the CMake command.
+
+\begin{lstlisting}
+cmake -DCMAKE_BUILD_TYPE=Release <path to linux folder in project>
+\end{lstlisting}
+
+With this command it will configure for the GNOME and KDE versions.
+
+To only build the GNOME or KDE version, use these options to turn one of the platforms off:
+\begin{lstlisting}
+-Dkde=OFF or -Dgnome=OFF
+\end{lstlisting}
+
+After it is done configuring, the \emph{make} command can be executed to compile it.
+When it is compiled, the \emph{make test} command can be used to run the unit-tests or
+the \emph{make install} can to install it system-wide.
+
+After the install command, it will work in GNOME immediately, in KDE the Dolphin plugin needs to be enabled first.
+
+To enable it open Dolphin and go to \emph{Control > Configure Dolphin > General > Previews}
+and enable previews for HDF5 Files.
+
+If the thumbnailer should be uninstalled again, \emph{make uninstall} needs to be executed in the build folder.
+
+\subsection{Windows}
+
+The Windows implementation is a VisualStudio solution.
+
+It consists of 2 sub projects. One is the thumbnailer itself,
+the other one is a \href{https://marketplace.visualstudio.com/items?itemName=VisualStudioProductTeam.MicrosoftVisualStudio2017InstallerProjects}{installer project}
+to create an install wizard.
+
+To install the thumbnailer, either the installer can be used (Recommended) or it can be installed manually,
+by executing the \emph{regsvr32.exe} command as an admin on the dll.

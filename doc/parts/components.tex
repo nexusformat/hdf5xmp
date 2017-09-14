@@ -1,0 +1,63 @@
+\subsection{Python scripts}
+The two Python scripts are called \emph{thumbnailInserter.py} and \emph{metadataReader.py}
+They require the \emph{argparse} and \emph{xmltodict} modules to be installed.
+
+\subsubsection{thumbnailInserter.py}
+This script takes a HDF5 file, and writes a version of it with the thumbnail and metadata.
+It has also the possibility of updating or delete existing data.
+
+When working with an HDF5 file that doesn't contain any XMP block, a new one will be created.
+If the file already has XMP data inside the script will update the data you give it and leave the rest alone.
+
+To work the script needs a few arguments. The first argument is the HDF5 file you want to use.
+If the HDF5 file doesn't already have a thumbnail, we need to provide the path to an image file
+via the \textbf{\emph{--img}} argument. The format of the image can be any format understandable by the system,
+but generally PNG or JPG for biggest possible compatibility and good quality/fileSize.
+
+If you want to write the data into a sidecar file, you need to provide the \textbf{\emph{--sidecar}} argument.
+
+When you don't provide the sidecar argument you need to specify an \emph{outFile}
+where to write the file with the metadata and thumbnail.
+This is specified with the \textbf{\emph{--outFile}} argument. (Or \textbf{\emph{-o}} as a short version).
+If omitted when writing to a sidecar file the name of the outFile will be the name of the
+HDF5 file with the \emph{hdf5} suffix replaced with \emph{xmp}.
+
+
+To provide additional data to insert into you can use the \textbf{\emph{--data}} or \textbf{\emph{-d}} argument.
+You can provide any amount of those arguments. The first word written after the argument
+represents the key name of the data and the second one the data to store in it.
+
+There are few restrictions as to what can be used as key names and values.
+Key names can't contain any character not normally allowed in an XML tag and can't be called \emph{Thumbnails}.
+Values can contain any printable character except \&, < and >.
+If you want to use any of these they need to be escaped. \emph{None} is also not allowed as a saved value.
+
+To remove a key-Value pair when updating, just set the value to \emph{None}
+
+Here is an example of inserting an image and some data into a file.
+\begin{lstlisting}
+./thumbnailInserter.py oldFiles/engine.hdf5 \
+    -o newFiles/engine.hdf5 --img ~/Pictures/placeholder.png \
+    -d Author "Bill from nextdoor" -d ApprovedBy Me
+\end{lstlisting}
+In this example we insert \emph{placeholder.png} as the thumbnail,
+\emph{Bill from nextdoor} as a value called \emph{Author} and who the file got approved by.
+
+If for example the ApprovedBy field isn't needed anymore and we want to remove it
+we can set its value to \emph{None} to remove the field.
+
+\begin{lstlisting}
+./thumbnailInserter.py newFiles/engine.hdf5 \
+    -o newerFiles/engine.hdf5 -d ApprovedBy None
+\end{lstlisting}
+This removes the \emph{ApprovedBy} field without touching the inserted thumbnail or Author.
+
+\subsubsection{metadataReader.py}
+This script reads the XMP data from the specified HDF5 or XMP file.
+
+The script has the option to output the thumbnail to a file or print the metadata to stdout formatted as JSON.
+
+\begin{lstlisting}
+./metadataReader.py newerFiles/engine.hdf5
+\end{lstlisting}
+This will output: \textbf{\{"Author": "Bill from nextdoor"\}}

@@ -1,0 +1,38 @@
+\subsection{Purpose}
+
+The purpose of this document is to describe the functionality of the HDF5 thumbnailer and how to use it.
+It should also tell how to add your own data to the HDF5 userblock without conflicting the current XMP metadata.
+
+\subsection{Definitions}
+
+\subsubsection{XMP}
+XMP is a format by Adobe, created to store metadata and thumbnails, and to be embedded into different file types.
+The XMP data can either be stored in a sidecar file next to the HDF5 file or directly in the file's userblock.
+
+The Python scripts allow you to specify additional data to populate the XMP with when inserting or updating the data.
+The scripts can also read that data from the XMP file again in JSON format for further use.
+
+\subsection{System overview}
+The purpose of this thumbnailer is to generate thumbnails for HDF5 files by extracting them from XMP data.
+The XMP data is either stored in a sidecar file or embedded into the HDF5 userblock, prefixed by a signature.
+
+The use of that signature should also be there to make storage of any data in the userblock more unified safer from overriding.
+A more detailed description about the signature can be found later in the document.
+
+\newpage
+\subsection{Source structure}
+
+\dirtree{%
+.1 /.
+.2 common \DTcomment{Core functionality for extracting a thumbnail}.
+.2 doc \DTcomment{Documentation}.
+.2 examples \DTcomment{Example HDF5 and XMP files with varying thumbnail store methods}.
+.2 hdf\_python \DTcomment{Python scripts for inserting, reading and updating metadata/thumbnails}.
+.3 tests \DTcomment{Unit tests for the Python scripts}.
+.2 linux \DTcomment{Linux implementations for the thumbnailer}.
+.3 gnome \DTcomment{GNOME implementation for Nautilus}.
+.3 kde \DTcomment{KDE implementation for Dolphin}.
+.3 tests \DTcomment{Unit-tests for the core thumbnailer functionality}.
+.2 windows \DTcomment{Windows implementation for the thumbnailer (Visual Studio project)}.
+}
+In the section Components~\ref{sec:Components} the important parts will be explained further.

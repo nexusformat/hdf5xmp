@@ -1,0 +1,90 @@
+\subsection{Overview}
+In this section will be explained how the XMP data is stored in the HDF5 file's userblock
+and how to store your own data without damaging other data stored there with this method.
+
+\subsubsection{How the userblock works}
+The userblock is a arbitrarily sized section that can be placed in any HDF5 file before it starts.
+
+When reading a HDF5 file the HDF5 library checks for the HDF5 signature at the start of the file.
+If it doesn't find a signature then it assumes that it contains a userblock and then it checks at the
+\emph{next power of 2} for the signature.
+It will do this until it either finds a signature or reaches the end of the file.
+When writing to the userblock it needs to pad the file until it reaches the next power of 2 for the HDF5 signature.
+
+
+\subsection{Position in the userblock}
+To ensure compatibility between multiple data blocks a signature
+to be used for the stored data blocks is specified.
+If the userblock has a correct signature then additional data can be inserted right before
+or after any other data block in the userblock.
+
+\subsection{Signature}
+The signature for the data blocks is an extension of the HDF5 signature with an added content length.
+
+The HDF5 signature is made up of 8 bytes with the following content:
+
+\begin{tabular}{ |r|c|c|c|c|c|c|c|c| }
+    \hline
+    Decimal:     & 137         & 72 & 68 & 70 & 13        & 10        & 26          & 10 \\ 
+    \hline
+    Hexadecimal: & 89          & 48 & 44 & 46 & 0d        & 0a        & 1a          & 0a \\ 
+    \hline
+    ASCII:       & \verb+\211+ & H  & D  & F  & \verb+\r+ & \verb+\n+ & \verb+\032+ & \verb+\n+ \\ 
+    \hline
+\end{tabular}
+
+The signature for a custom data block is made up of two parts.
+
+The first is the identifier:
+
+\begin{tabular}{ |r|c|c|c|c|c|c|c|c| }
+    \hline
+    Decimal:     & 137         & 72 & ** & ** & 13        & 10        & 26          & 10 \\ 
+    \hline
+    Hexadecimal: & 89          & 48 & ** & ** & 0d        & 0a        & 1a          & 0a \\ 
+    \hline
+    ASCII:       & \verb+\211+ & H  & *  & *  & \verb+\r+ & \verb+\n+ & \verb+\032+ & \verb+\n+ \\ 
+    \hline
+\end{tabular}
+
+Except for bytes 3 and 4 it is the same as the HDF5 identifier.
+Bytes 3 and 4 can be any value as long as it isn't used by another program, meaning they can't be the same
+as the ones in the identifiers for the HDF5 and XMP metadata signature.
+
+For example, the XMP block with the metadata and thumbnail have this signature:
+
+\begin{tabular}{ |r|c|c|c|c|c|c|c|c| }
+    \hline
+    Decimal:     & 137         & 72 & 77 & 80 & 13        & 10        & 26          & 10 \\
+    \hline
+    Hexadecimal: & 89          & 48 & 4D & 50 & 0d        & 0a        & 1a          & 0a \\
+    \hline
+    ASCII:       & \verb+\211+ & H  & M  & P  & \verb+\r+ & \verb+\n+ & \verb+\032+ & \verb+\n+ \\
+    \hline
+\end{tabular}
+
+The \textbf{M}etadata XM\textbf{P} header is extracted by the thumbnailer, while others are skipped.
+
+The next part of the signature is 8 bytes describing the size of the data, in \textbf{big-endian} byte order.
+Storing the size lets the thumbnail inserter know where it could potentially insert the XMP block and
+it lets the thumbnailer find the data faster 
+
+Here is an example size of 105585 bytes:
+
+\begin{tabular}{ |r|c|c|c|c|c|c|c|c| }
+    \hline
+    Hexadecimal: & 00 & 00 & 00 & 00 & 00 & 01 & 9C & 71 \\
+    \hline
+\end{tabular}
+
+With the identifier, our XMP data will have this signature:
+
+\begin{tabular}{ |r|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c| }
+    \hline
+    Hexadecimal: & 89 & 48 & 4D & 50 & 0D & 0A & 1A & 0A & 00 & 00 & 00 & 00 & 00 & 01 & 9C & 71 \\
+    \hline
+\end{tabular}
+
+When the thumbnailer reads the signatures it first reads the first 8 bytes.
+It then looks if it's a valid header by just ignoring byte 3 and 4.
+If it's valid then it checks if it's an XMP with metadata by comparing it to the HMP header.
