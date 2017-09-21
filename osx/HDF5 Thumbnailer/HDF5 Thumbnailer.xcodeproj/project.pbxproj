@@ -1,0 +1,346 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D114602A1F738ACF00208600 /* GenerateThumbnailForURL.c in Sources */ = {isa = PBXBuildFile; fileRef = D11460291F738ACF00208600 /* GenerateThumbnailForURL.c */; };
+		D114602C1F738ACF00208600 /* GeneratePreviewForURL.c in Sources */ = {isa = PBXBuildFile; fileRef = D114602B1F738ACF00208600 /* GeneratePreviewForURL.c */; };
+		D114602E1F738ACF00208600 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = D114602D1F738ACF00208600 /* main.c */; };
+		D1BE9D321F7393CF003E3137 /* hdf5OSXImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1BE9D301F7393CF003E3137 /* hdf5OSXImpl.cpp */; };
+		D1BE9D331F7393CF003E3137 /* hdf5OSXImpl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D1BE9D311F7393CF003E3137 /* hdf5OSXImpl.hpp */; };
+		D1BE9D431F73A36A003E3137 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1BE9D3D1F73A369003E3137 /* base64.cpp */; };
+		D1BE9D441F73A36A003E3137 /* base64.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BE9D3E1F73A369003E3137 /* base64.h */; };
+		D1BE9D451F73A36A003E3137 /* thumbnailerCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1BE9D3F1F73A369003E3137 /* thumbnailerCore.cpp */; };
+		D1BE9D461F73A36A003E3137 /* thumbnailerCore.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BE9D401F73A369003E3137 /* thumbnailerCore.h */; };
+		D1BE9D471F73A36A003E3137 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1BE9D411F73A369003E3137 /* tinyxml2.cpp */; };
+		D1BE9D481F73A36A003E3137 /* tinyxml2.h in Headers */ = {isa = PBXBuildFile; fileRef = D1BE9D421F73A369003E3137 /* tinyxml2.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D11460261F738ACF00208600 /* HDF5 Thumbnailer.qlgenerator */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HDF5 Thumbnailer.qlgenerator"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D11460291F738ACF00208600 /* GenerateThumbnailForURL.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = GenerateThumbnailForURL.c; sourceTree = "<group>"; };
+		D114602B1F738ACF00208600 /* GeneratePreviewForURL.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = GeneratePreviewForURL.c; sourceTree = "<group>"; };
+		D114602D1F738ACF00208600 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		D114602F1F738ACF00208600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D1BE9D301F7393CF003E3137 /* hdf5OSXImpl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hdf5OSXImpl.cpp; sourceTree = "<group>"; };
+		D1BE9D311F7393CF003E3137 /* hdf5OSXImpl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hdf5OSXImpl.hpp; sourceTree = "<group>"; };
+		D1BE9D3D1F73A369003E3137 /* base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = base64.cpp; sourceTree = "<group>"; };
+		D1BE9D3E1F73A369003E3137 /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
+		D1BE9D3F1F73A369003E3137 /* thumbnailerCore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thumbnailerCore.cpp; sourceTree = "<group>"; };
+		D1BE9D401F73A369003E3137 /* thumbnailerCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thumbnailerCore.h; sourceTree = "<group>"; };
+		D1BE9D411F73A369003E3137 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
+		D1BE9D421F73A369003E3137 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D11460221F738ACF00208600 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D114601C1F738ACF00208600 = {
+			isa = PBXGroup;
+			children = (
+				D11460281F738ACF00208600 /* HDF5 Thumbnailer */,
+				D11460271F738ACF00208600 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D11460271F738ACF00208600 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D11460261F738ACF00208600 /* HDF5 Thumbnailer.qlgenerator */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D11460281F738ACF00208600 /* HDF5 Thumbnailer */ = {
+			isa = PBXGroup;
+			children = (
+				D1BE9D3C1F73A369003E3137 /* common */,
+				D11460291F738ACF00208600 /* GenerateThumbnailForURL.c */,
+				D114602B1F738ACF00208600 /* GeneratePreviewForURL.c */,
+				D114602D1F738ACF00208600 /* main.c */,
+				D114602F1F738ACF00208600 /* Info.plist */,
+				D1BE9D301F7393CF003E3137 /* hdf5OSXImpl.cpp */,
+				D1BE9D311F7393CF003E3137 /* hdf5OSXImpl.hpp */,
+			);
+			path = "HDF5 Thumbnailer";
+			sourceTree = "<group>";
+		};
+		D1BE9D3C1F73A369003E3137 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				D1BE9D3D1F73A369003E3137 /* base64.cpp */,
+				D1BE9D3E1F73A369003E3137 /* base64.h */,
+				D1BE9D3F1F73A369003E3137 /* thumbnailerCore.cpp */,
+				D1BE9D401F73A369003E3137 /* thumbnailerCore.h */,
+				D1BE9D411F73A369003E3137 /* tinyxml2.cpp */,
+				D1BE9D421F73A369003E3137 /* tinyxml2.h */,
+			);
+			name = common;
+			path = ../../../common;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D11460231F738ACF00208600 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1BE9D331F7393CF003E3137 /* hdf5OSXImpl.hpp in Headers */,
+				D1BE9D461F73A36A003E3137 /* thumbnailerCore.h in Headers */,
+				D1BE9D441F73A36A003E3137 /* base64.h in Headers */,
+				D1BE9D481F73A36A003E3137 /* tinyxml2.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D11460251F738ACF00208600 /* HDF5 Thumbnailer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D11460321F738ACF00208600 /* Build configuration list for PBXNativeTarget "HDF5 Thumbnailer" */;
+			buildPhases = (
+				D11460211F738ACF00208600 /* Sources */,
+				D11460221F738ACF00208600 /* Frameworks */,
+				D11460231F738ACF00208600 /* Headers */,
+				D11460241F738ACF00208600 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "HDF5 Thumbnailer";
+			productName = "HDF5 Thumbnailer";
+			productReference = D11460261F738ACF00208600 /* HDF5 Thumbnailer.qlgenerator */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D114601D1F738ACF00208600 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "Semafor AG";
+				TargetAttributes = {
+					D11460251F738ACF00208600 = {
+						CreatedOnToolsVersion = 9.0;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D11460201F738ACF00208600 /* Build configuration list for PBXProject "HDF5 Thumbnailer" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D114601C1F738ACF00208600;
+			productRefGroup = D11460271F738ACF00208600 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D11460251F738ACF00208600 /* HDF5 Thumbnailer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D11460241F738ACF00208600 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D11460211F738ACF00208600 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D114602A1F738ACF00208600 /* GenerateThumbnailForURL.c in Sources */,
+				D114602C1F738ACF00208600 /* GeneratePreviewForURL.c in Sources */,
+				D114602E1F738ACF00208600 /* main.c in Sources */,
+				D1BE9D431F73A36A003E3137 /* base64.cpp in Sources */,
+				D1BE9D451F73A36A003E3137 /* thumbnailerCore.cpp in Sources */,
+				D1BE9D321F7393CF003E3137 /* hdf5OSXImpl.cpp in Sources */,
+				D1BE9D471F73A36A003E3137 /* tinyxml2.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D11460301F738ACF00208600 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D11460311F738ACF00208600 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D11460331F738ACF00208600 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "HDF5 Thumbnailer/Info.plist";
+				INSTALL_PATH = /Library/QuickLook;
+				OTHER_CFLAGS = "-I../../common";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.semafor.HDF5-Thumbnailer";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = qlgenerator;
+			};
+			name = Debug;
+		};
+		D11460341F738ACF00208600 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "HDF5 Thumbnailer/Info.plist";
+				INSTALL_PATH = /Library/QuickLook;
+				OTHER_CFLAGS = "-I../../common";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.semafor.HDF5-Thumbnailer";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = qlgenerator;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D11460201F738ACF00208600 /* Build configuration list for PBXProject "HDF5 Thumbnailer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D11460301F738ACF00208600 /* Debug */,
+				D11460311F738ACF00208600 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D11460321F738ACF00208600 /* Build configuration list for PBXNativeTarget "HDF5 Thumbnailer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D11460331F738ACF00208600 /* Debug */,
+				D11460341F738ACF00208600 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D114601D1F738ACF00208600 /* Project object */;
+}

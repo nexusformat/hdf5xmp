@@ -11,13 +11,21 @@
 #define HDF_FILE_ENDING ".hdf5"
 
 #ifndef WIN32
+#ifndef __APPLE__
 #include <endian.h>
+#else
+#include <libkern/OSByteOrder.h>
+#endif
 #else
 #include <winsock.h>
 #endif
 
 #ifndef WIN32
+#ifdef __APPLE__
+#define get_correct_byteorder(x) OSSwapBigToHostInt64(x)
+#else
 #define get_correct_byteorder(x) be64toh(x)
+#endif
 #else
 // If the system is big endian just return the value else swap it
 #define get_correct_byteorder(x) htonl(47) == 47 ? x : _byteswap_uint64(x)
