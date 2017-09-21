@@ -37,3 +37,13 @@ to create an install wizard.
 
 To install the thumbnailer, either the installer can be used (Recommended) or it can be installed manually,
 by executing the \emph{regsvr32.exe} command as an admin on the dll.
+
+\subsection{OSX}
+
+The OSX implementation is a Xcode project.
+
+When you build it, it automatically installs itself for the current user, into the directory
+\emph{/Users/<username>/Library/QuickLook/HDF5 Thumbnailer.qlgenerator}.
+
+To make it available to all users of the system, copy the \emph{HDF5 Thumbnailer.qlgenerator} folder into
+\emph{/Library/QuickLook/}
