@@ -12,17 +12,42 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>org.hdfgroup.hdf5</string>
-                <string>dyn.ah62d4rv4ge80u3dggy</string>
+				<string>dyn.ah62d4rv4ge80u3dggy</string>
 			</array>
-            
 		</dict>
 	</array>
-    <key>UTImportedTypeDeclarations</key>
+    <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
             <key>UTTypeConformsTo</key>
             <array>
                 <string>public.data</string>
+                <string>public.archive</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>HDF5 File</string>
+            <key>UTTypeIdentifier</key>
+            <string>org.hdfgroup.hdf5</string>
+            <key>UTTypeReferenceURL</key>
+            <string>https://www.hdfgroup.org/HDF5/</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>hdf</string>
+                    <string>hdf5</string>
+                </array>
+                <key>public.mime-type</key>
+                <string>application/x-hdf</string>
+            </dict>
+        </dict>
+    </array><key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+                <string>public.archive</string>
             </array>
             <key>UTTypeDescription</key>
             <string>HDF5 File</string>

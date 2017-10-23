@@ -19,11 +19,11 @@ OSStatus GenerateThumbnailForURL(void *thisInterface, QLThumbnailRequestRef thum
     const char* path = CFStringGetCStringPtr(stringURL, kCFStringEncodingUTF8);
     long length = CFStringGetLength(stringURL);
     
-    CGImageRef image = getThumbnailOSX(path, length);
-    if(image == NULL) {
-        return -1;
-    }
+    getThumbnailOSX(path, length);
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithFilename("/tmp/thumbnail.png");
+    CGImageRef image = CGImageCreateWithPNGDataProvider(dataProvider, NULL, false, kCGRenderingIntentDefault);
     QLThumbnailRequestSetImage(thumbnail, image, NULL);
+    CGDataProviderRelease(dataProvider);
     CGImageRelease(image);
     // To complete your generator please implement the function GenerateThumbnailForURL in GenerateThumbnailForURL.c
     return noErr;

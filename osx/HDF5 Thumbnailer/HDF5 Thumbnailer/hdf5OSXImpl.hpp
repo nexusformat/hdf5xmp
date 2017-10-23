@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    CGImageRef getThumbnailOSX(const char* path, long length);
+    void getThumbnailOSX(const char* path, long length);
 #ifdef __cplusplus
 }
 #endif

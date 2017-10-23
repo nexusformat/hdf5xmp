@@ -17,6 +17,14 @@ std::string getData(const char* p, long l) {
     if(path.find("file://") == 0) {
         path = path.substr(sizeof("file://") - 1);
     }
+    std::string::size_type pos = 0u;
+    while((pos = path.find("%20", pos)) != std::string::npos) {
+        path.replace(pos, 3, " ");
+        pos += 1;
+    }
+    
+    std::ofstream test("/tmp/path");
+    test.write(path.c_str(), path.length());
     
     return std::string(getThumbnail(path));
 }
@@ -24,15 +32,11 @@ std::string getData(const char* p, long l) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-    CGImageRef getThumbnailOSX(const char* path, long length) {
+    void getThumbnailOSX(const char* path, long length) {
         
         std::string data = getData(path, length);
-        
-        CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, data.c_str(), data.length(), NULL);
-        
-        CGImageRef img = CGImageCreateWithPNGDataProvider(dataProvider, NULL, false, kCGRenderingIntentDefault);
-        CGDataProviderRelease(dataProvider);
-        return img;
+        std::ofstream test("/tmp/thumbnail.png", std::ios::binary);
+        test.write(data.c_str(), data.length());
     }
 #ifdef __cplusplus
 }

@@ -19,23 +19,26 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
     const char* path = CFStringGetCStringPtr(stringURL, kCFStringEncodingUTF8);
     long length = CFStringGetLength(stringURL);
     
-    CGImageRef image = getThumbnailOSX(path, length);
-    if(image == NULL) {
-        return -1;
-    }
+    getThumbnailOSX(path, length);
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithFilename("/tmp/thumbnail.png");
+    CGImageRef image = CGImageCreateWithPNGDataProvider(dataProvider, NULL, false, kCGRenderingIntentDefault);
+    
     CGFloat width = CGImageGetWidth(image);
     CGFloat height = CGImageGetHeight(image);
     CGSize size = {width, height};
     CGContextRef context = QLPreviewRequestCreateContext(preview, size, true, NULL);
 
     if(!context) {
+        CGDataProviderRelease(dataProvider);
+        CGImageRelease(image);
         return -1;
     }
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
     QLPreviewRequestFlushContext(preview, context);
-    CGImageRelease(image);
-    CGContextRelease(context);
 
+    CGContextRelease(context);
+    CGImageRelease(image);
+    CGDataProviderRelease(dataProvider);
     return noErr;
 }
 
