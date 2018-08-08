@@ -8,6 +8,7 @@ import math
 import os
 import struct
 import sys
+import codecs
 
 import xmltodict
 
@@ -45,7 +46,7 @@ def check_header(file, location, header):
     """Check if at the specified position The header of a hdf5 file is found"""
     file.seek(location)
     sig = file.read(8)
-    return int.from_bytes(sig, byteorder="big") == header
+    return int(codecs.encode(sig, 'hex'), 16) == header
 
 
 def exists_header(file, location):
@@ -53,7 +54,7 @@ def exists_header(file, location):
     file.seek(location)
     sig = file.read(8)
     # Compare but ignore the two changeable byts
-    return int.from_bytes(sig, byteorder="big") & 0xffff0000ffffffff == MAGIC_HDF & 0xffff0000ffffffff
+    return int(codecs.encode(sig, 'hex'), 16) & 0xffff0000ffffffff == MAGIC_HDF & 0xffff0000ffffffff
 
 
 def read_datablock_size(file, location):
@@ -61,7 +62,7 @@ def read_datablock_size(file, location):
     # Advance 8 bytes to skip signature
     file.seek(location + 8)
     # Return the 8 byte long size
-    return int.from_bytes(file.read(8), byteorder="big")
+    return int(codecs.encode(file.read(8), 'hex'), 16)
 
 
 def construct_xmp_file(imageFile, key_value_data):
@@ -69,7 +70,7 @@ def construct_xmp_file(imageFile, key_value_data):
     # Remove the quotes and leading b from the string
     base64Image = base64.b64encode(imageFile.read()).decode('utf-8')
     # Get the xmp template
-    path = os.path.dirname(os.path.abspath(__file__)) + "/template.xmp"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"template.xmp")
 
     with open(path, "r") as xmpFile:
         xmp = xmpFile.read()
