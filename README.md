@@ -8,6 +8,16 @@ It contains:
     * A thumbnail Provider for the file managers Dolphin, Nautilus and Explorer.
     * Example HDF-5 files with thumbnails inserted into them.
 
+[Presentation of HDF5+XMP](https://www.hdfgroup.org/wp-content/uploads/2019/09/Watts_XMP.pdf) at the [2019 HDF5 European Workshop](https://www.hdfgroup.org/2019/09/27/hdf5-european-workshop/)
+
+## Quick Start
+
+If you just want to install the pre-built plugins for viewing thumbnails when browsing HDF5 files, 
+download the installer or archive appropriate for your operating system from the 
+[Releases page](https://github.com/nexusformat/hdf5xmp/releases) (expand the "assets" list to see the download links).
+
+To see the thumbnailer service in action, you will also need some HDF5 files with the XMP data already included - some example files are available [here](https://github.com/nexusformat/hdf5xmp/tree/master/examples) and [here](https://github.com/nexusformat/exampledata/tree/master/SLS).
+
 
 ## Project structure
 
@@ -31,8 +41,8 @@ The first 4 bytes define the size of the thumbnail.
 They are directly followed by the image itself.
 
 The image format can technically be any by the file managers recognized format.
-But to ensure that it will work on any operating system JPEG, GIF or PNG are the recommended formats
-depending on what compresses the best for the current image.
+But to ensure that it will work on any operating system, JPEG, GIF or PNG are the recommended formats
+depending on which compresses the best for the thumbnail image.
 
 ### Thumbnail extraction
 
